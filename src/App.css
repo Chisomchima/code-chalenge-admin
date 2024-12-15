@@ -1,0 +1,18 @@
+body {
+  background-color: white;
+  font-size: 12px;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  width: 100vw;
+  height: 100%;
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+}
+* {
+  font-size: 12px;
+}
+.alice-carousel__wrapper .alice-carousel__prev-btn,
+.alice-carousel__wrapper .alice-carousel__next-btn {
+  display: none !important;
+}
