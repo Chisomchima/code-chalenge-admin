@@ -1,7 +1,12 @@
 import React from "react";
+import Index from "../../components/auth/Index";
 
-const index = () => {
-  return <div>index</div>;
+const Login = () => {
+  return (
+    <div>
+      <Index />
+    </div>
+  );
 };
 
-export default index;
+export default Login;
