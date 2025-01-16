@@ -7,7 +7,7 @@ import TimerIcon from "@mui/icons-material/Timer";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import CardStats from "../ui/CardStats";
 
-const StatsDashboard: React.FC = () => {
+const StatsChallenges: React.FC = () => {
   const [activeFilter, setActiveFilter] = useState("Week");
 
   console.log("Active Filter:", activeFilter);
@@ -118,4 +118,4 @@ const StatsDashboard: React.FC = () => {
   );
 };
 
-export default StatsDashboard;
+export default StatsChallenges;

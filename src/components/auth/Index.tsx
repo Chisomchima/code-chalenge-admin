@@ -32,8 +32,8 @@ const Index = () => {
         <img src="/images/devspax.svg" className="h-8" alt=" Logo" />
       </Box>
       <Box>
-        <AdminId />
-        {/* <OTP /> */}
+        {/* <AdminId /> */}
+        <OTP />
       </Box>
       <Box
         sx={{

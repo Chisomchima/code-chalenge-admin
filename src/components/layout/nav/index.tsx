@@ -118,7 +118,11 @@ const Nav: React.FC<{
                     key={item.title}
                     icon={item.icon}
                     title={item.title}
-                    isActive={location.pathname === item.path}
+                    isActive={
+                      item.path === "/"
+                        ? location.pathname === "/"
+                        : location.pathname.startsWith(item.path)
+                    }
                   />
                 </Box>
               </Box>

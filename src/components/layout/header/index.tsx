@@ -1,3 +1,4 @@
+import React, { useEffect } from "react";
 import {
   Box,
   Typography,
@@ -8,12 +9,43 @@ import {
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import { IoNotificationsCircleOutline } from "react-icons/io5";
+import { useLocation } from "react-router-dom";
+import { Navigation } from "../../../utils/Enums";
+
 const Header: React.FC<{
   small: boolean;
   large: boolean;
   openSmallClick: () => void;
   openLargeClick: () => void;
 }> = ({ large }) => {
+  const location = useLocation();
+
+  useEffect(() => {
+    const currentPath = location.pathname.split('/')[1];
+
+    if (currentPath === "challenges") {
+      console.log("We are on the Challenges page!");
+    }
+  }, [location]);
+
+  const getHeaderTitle = (path: string): string => {
+    const firstPath = path.split('/')[1];
+    switch (firstPath) {
+      case "":
+        return Navigation.Dashboard;
+      case "challenges":
+        return Navigation.ChallengePage;
+      case "users":
+        return Navigation.users;
+      case "community":
+        return Navigation.community;
+      case "admins":
+        return Navigation.admins;
+      default:
+        return "Unknown Page";
+    }
+  };
+
   return (
     <Box
       sx={{
@@ -41,12 +73,16 @@ const Header: React.FC<{
       >
         <Box>
           <Typography
-            variant="h4"
-            sx={{ fontWeight: "bold", color: "#28004B" }}
+            variant="h6"
+            sx={{ fontWeight: "normal", color: "#28004B" }}
           >
-            Dash Board
+            {getHeaderTitle(location.pathname)}
           </Typography>
-          <Typography variant="body2" sx={{ color: "gray" }}>
+
+          <Typography
+            variant="body2"
+            sx={{ color: "gray", fontWeight: "lighter" }}
+          >
             Monday, 19th August 2024.
           </Typography>
         </Box>
@@ -80,7 +116,7 @@ const Header: React.FC<{
               sx={{ width: "40px", height: "40px", marginRight: "10px" }}
             />
             <Box sx={{ textAlign: "left" }}>
-              <Typography variant="body1" sx={{ fontWeight: "bold" }}>
+              <Typography variant="body1" sx={{ fontWeight: "normal" }}>
                 Precious Fredrick
               </Typography>
               <Typography variant="caption" sx={{ color: "gray" }}>
