@@ -21,6 +21,10 @@ A modern React-based admin dashboard for managing coding challenges, user progre
 - Tailwind CSS for styling
 - React Hook Form for form management
 
+## Contributors
+
+- [Abraham Christopher](https://github.com/Cabraham1) - Lead Developer
+
 ## Getting Started
 
 1. Clone the repository:
