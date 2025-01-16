@@ -2,7 +2,7 @@ import { Box } from "@mui/material";
 import AdminId from "./AdminId";
 import OTP from "./OTP";
 
-const Index = () => {
+const Index: React.FC = () => {
   return (
     <Box sx={{ width: "100%" }}>
       <Box

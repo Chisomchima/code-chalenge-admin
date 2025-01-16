@@ -1,37 +1,56 @@
-import {} from "react";
+import React, { lazy, Suspense } from "react";
 import { Route, Routes } from "react-router-dom";
-import Login from "./pages/login";
-// import Loader from "./components/ui/Loader";
+import Loader from "./components/ui/Loader";
 import AppLayout from "./layouts/AppLayout";
-import Home from "./pages/home";
-import Challenges from "./pages/challenges";
-import CreateChallenge from "./pages/challenges/create";
+import ErrorBoundary from "./hooks/ErrorBoundary";
+
+const Login = lazy(() => import("./pages/login"));
+const Home = lazy(() => import("./pages/home"));
+const Challenges = lazy(() => import("./pages/challenges"));
+const CreateChallenge = lazy(() => import("./pages/challenges/create"));
+const NotFoundPage = React.lazy(() => import("./pages/not-found.tsx"));
+
+const routes = [
+  // public
+  { path: "/login", component: Login },
+
+  // Protected routes
+  { path: "/", component: Home, protected: true },
+  { path: "/challenges", component: Challenges, protected: true },
+  { path: "/challenges/new", component: CreateChallenge, protected: true },
+];
 
 function App() {
-  // const [loading, setLoading] = useState(true);
-
-  // useEffect(() => {
-  //   const timer = setTimeout(() => {
-  //     setLoading(false);
-  //   }, 2000);
-  //   return () => clearTimeout(timer);
-  // }, []);
-
-  // if (loading) {
-  //   return <Loader />;
-  // }
-
   return (
-    <Routes>
-      <Route path="/login" element={<Login />} />
-      <Route path="/" element={<AppLayout />}>
-        <Route path="/" element={<Home />} />
-        <Route path="/challenges" element={<Challenges />} />
-        <Route path="/challenges/new" element={<CreateChallenge />} />
+    <ErrorBoundary>
+      <Routes>
+        {routes.map(({ path, component, protected: isProtected }) => {
+          const RouteComponent = component ? (
+            <Suspense fallback={<Loader />}>
+              {React.createElement(component)}
+            </Suspense>
+          ) : null;
 
-        {/* <Route path="*" element={<NotFound />} /> */}
-      </Route>
-    </Routes>
+          return isProtected ? (
+            <Route key={path} element={<AppLayout />}>
+              <Route path={path} element={RouteComponent} />
+            </Route>
+          ) : (
+            <Route key={path} path={path} element={RouteComponent} />
+          );
+        })}
+
+        {/* Catch-all route for 404 page */}
+        <Route
+          path="*"
+          element={
+            <Suspense fallback={<Loader />}>
+              <NotFoundPage />
+            </Suspense>
+          }
+        />
+      </Routes>
+    </ErrorBoundary>
   );
 }
 

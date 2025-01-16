@@ -1,7 +1,7 @@
 import React from "react";
 import Index from "../../components/auth/Index";
 
-const Login = () => {
+const Login: React.FC = () => {
   return (
     <div>
       <Index />

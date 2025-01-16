@@ -2,7 +2,7 @@ import { Box } from "@mui/material";
 import React from "react";
 import NewChallengeForm from "../../components/challenges/NewChallengeForm";
 
-const CreateChallenges = () => {
+const CreateChallenges: React.FC = () => {
   return (
     <Box>
       <NewChallengeForm />
