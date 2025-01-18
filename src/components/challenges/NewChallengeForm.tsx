@@ -128,10 +128,19 @@ const NewChallengeForm: React.FC = () => {
         </Box>
       ))}
       <Button
-        variant="outlined"
+        variant="contained"
         startIcon={<Add />}
         onClick={() => append({ title: "", description: "" })}
-        sx={{ mt: 1 }}
+        sx={{
+          mt: 1,
+          backgroundColor: "white",
+          color: "blue",
+          boxShadow: 3,
+          borderRadius: 1,
+          "&:hover": {
+            backgroundColor: "white",
+          },
+        }}
       >
         Add {label}
       </Button>

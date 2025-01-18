@@ -26,9 +26,7 @@ function App() {
       <Routes>
         {routes.map(({ path, component, protected: isProtected }) => {
           const RouteComponent = component ? (
-            <Suspense fallback={<Loader />}>
-              {React.createElement(component)}
-            </Suspense>
+            <Suspense>{React.createElement(component)}</Suspense>
           ) : null;
 
           return isProtected ? (
