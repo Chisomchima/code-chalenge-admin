@@ -1,8 +1,12 @@
+import React from "react";
 import { Box } from "@mui/material";
 import AdminId from "./AdminId";
 import OTP from "./OTP";
 
 const Index: React.FC = () => {
+  const [showOTP, setShowOTP] = React.useState(false);
+  const [adminEmail, setAdminEmail] = React.useState("");
+
   return (
     <Box sx={{ width: "100%" }}>
       <Box
@@ -32,8 +36,14 @@ const Index: React.FC = () => {
         <img src="/images/devspax.svg" className="h-8" alt=" Logo" />
       </Box>
       <Box>
-        {/* <AdminId /> */}
-        <OTP />
+        {
+          showOTP ? (
+            <OTP adminEmail={adminEmail}/>
+          ) : (
+            <AdminId setShowOTP={setShowOTP} setAdminEmail={setAdminEmail} />
+          )
+        }
+
       </Box>
       <Box
         sx={{

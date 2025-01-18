@@ -1,17 +1,29 @@
 import { Box, Button, FormHelperText } from "@mui/material";
 import { Controller, useForm } from "react-hook-form";
 import { MuiOtpInput } from "mui-one-time-password-input";
+import { useVerifyOTP } from "../../hooks/react-query/useAuth";
+import Loader from "../ui/Loader";
+import { useNavigate } from "react-router-dom";
 
-const OTP = () => {
+const OTP: React.FC<{ adminEmail: string }> = ({ adminEmail }) => {
+  const navigate = useNavigate();
   const { control, handleSubmit } = useForm({
     defaultValues: {
       otp: "",
     },
   });
 
-  const onSubmit = (data: any) => {
-    alert(JSON.stringify(data));
+  const { mutateAsync: verify, isLoading } = useVerifyOTP();
+
+  const onSubmit = async (data: { otp: string; }) => {
+    const payload = {
+      email: adminEmail,
+      otp: data.otp
+    };
+    await verify(payload);
+    navigate('/');
   };
+
 
   return (
     <>
@@ -77,6 +89,9 @@ const OTP = () => {
                 </Box>
               )}
             />
+
+            {isLoading && <Loader />}
+
             <Button
               type="submit"
               variant="contained"

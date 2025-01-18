@@ -1,15 +1,28 @@
 import { Box, Button, TextField } from "@mui/material";
 import { useForm } from "react-hook-form";
+import { useLogin } from "../../hooks/react-query/useAuth";
+import Loader from "../ui/Loader";
 
-const AdminId = () => {
+interface AdminIdProps {
+  setShowOTP: (value: boolean) => void;
+  setAdminEmail: (value: string) => void;
+}
+
+const AdminId = ({ setShowOTP, setAdminEmail }: AdminIdProps) => {
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm();
+  } = useForm<{ id: string }>();
 
-  const onSubmit = (data: any) => {
-    console.log(data);
+  const { mutateAsync: login, isLoading } = useLogin();
+
+  const onSubmit = async (data: { id: any; }) => {
+    setAdminEmail(data.id);
+
+    await login(data);
+    setShowOTP(true);
+
   };
 
   return (
@@ -41,21 +54,23 @@ const AdminId = () => {
           <Box sx={{ my: 2, mx: 70 }}>
             <TextField
               type="text"
-              label="Admin ID"
+              label="Admin Email"
               variant="outlined"
               fullWidth
               margin="normal"
-              {...register("adminId", {
-                required: "adminId is required",
+              {...register("id", {
+                required: "Email is required",
               })}
-              error={!!errors.adminId}
+              error={!!errors.id}
               helperText={
-                errors.adminId ? (errors.adminId.message as string) : undefined
+                errors.id ? (errors.id.message as string) : undefined
               }
               sx={{
                 mt: 5,
               }}
             />
+
+            {isLoading && <Loader />}
 
             <Button
               type="submit"

@@ -11,6 +11,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import { IoNotificationsCircleOutline } from "react-icons/io5";
 import { useLocation } from "react-router-dom";
 import { Navigation } from "../../../utils/Enums";
+import Cookies from 'js-cookie'
 
 const Header: React.FC<{
   small: boolean;
@@ -45,6 +46,15 @@ const Header: React.FC<{
         return "Unknown Page";
     }
   };
+
+  const profile = Cookies.get('adminProfile')
+  let firstName = "";
+  let lastName = "";
+  if (profile) {
+    const profileData = JSON.parse(profile);
+    firstName = profileData.firstName;
+    lastName = profileData.lastName;
+  }
 
   return (
     <Box
@@ -117,7 +127,7 @@ const Header: React.FC<{
             />
             <Box sx={{ textAlign: "left" }}>
               <Typography variant="body1" sx={{ fontWeight: "normal" }}>
-                Precious Fredrick
+                {firstName} {lastName}
               </Typography>
               <Typography variant="caption" sx={{ color: "gray" }}>
                 @Admin001

@@ -135,10 +135,10 @@ const NewChallengeForm: React.FC = () => {
           mt: 1,
           backgroundColor: "white",
           color: "blue",
-          boxShadow: 3,
-          borderRadius: 1,
+          boxShadow: 2,
+          p: 1,
           "&:hover": {
-            backgroundColor: "white",
+            backgroundColor: "#f0f0f0",
           },
         }}
       >

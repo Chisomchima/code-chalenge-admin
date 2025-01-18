@@ -1,61 +1,47 @@
-import { axiosInstance, handleError } from '@/utils/axiosInstance'
 import { AxiosError } from 'axios';
 import Cookies from 'js-cookie'
 import { toast } from 'react-toastify'
+import { axiosInstance, handleError } from '../utils/axiosInstance';
 
-export const login = async (data: { email: string; password: string }) => {
+export const login = async (data: { id: string }) => {
     try {
-        const response = await axiosInstance.post('/api/auth/login', data)
-        console.log(response, 'response')
-
-        const { token, user } = response?.data?.content || {}
-
-        if (token && user && response?.data?.success) {
-            Cookies.set('authToken', token.token, {
-                path: '/',
-                secure: import.meta.env.PROD,
-                sameSite: 'Strict',
-            })
-
-            Cookies.set('userId', user, {
-                path: '/',
-                secure: import.meta.env.PROD,
-                sameSite: 'Strict',
-            })
-
-            console.log(`User ID: ${user}`)
-
-            // Fetch user profile securely
-            await fetchProfile(user)
-
-            toast.success('Login successful!')
-            return response.data
-        } else {
-            throw new Error('Invalid login response: Token or User ID is missing.')
-        }
-    } catch (error) {
-        handleError(error as AxiosError, 'An unexpected error occurred during login.')
-    }
-}
-
-export const fetchProfile = async (userId: string) => {
-    try {
-        const response = await axiosInstance.get(`/api/users/get-user/${userId}`)
-        console.log(response.data, 'User Profile')
-
-        // Save the profile data in a cookie
-        Cookies.set('userProfile', JSON.stringify(response.data), {
-            path: '/',
-            secure: import.meta.env.PROD,
-            sameSite: 'Strict',
-        })
-
+        const response = await axiosInstance.post('/api/admin/login', data)
         return response.data
     } catch (error) {
-        handleError(error as AxiosError, 'Failed to fetch user profile.')
-        throw error // Ensure login flow halts if profile fetch fails
+        handleError(error as AxiosError, 'Login failed.')
+        throw error
     }
 }
+
+export const verifyOTP = async (data: { email: string; otp: string }) => {
+    try {
+        const response = await axiosInstance.post('/api/admin/verify', data)
+
+        const { tokens, adminProfile } = response?.data?.content || {}
+
+        if (tokens && adminProfile && response?.data?.success) {
+            Cookies.set('authToken', tokens.token, {
+                path: '/',
+                sameSite: 'Strict',
+            })
+
+            Cookies.set('adminProfile', JSON.stringify(adminProfile), {
+                path: '/',
+                sameSite: 'Strict',
+            })
+
+            toast.success('OTP verification successful!')
+           
+            return response.data
+        } else {
+            throw new Error('Invalid OTP verification response: Token or User ID is missing.')
+        }
+    } catch (error) {
+        handleError(error as AxiosError, 'An unexpected error occurred during OTP verification.')
+        throw error
+    }
+}
+
 export const getBadge = async (userId: string, badgeId: string) => {
     try {
         const response = await axiosInstance.get(`/api/users/send-badge/${userId}/${badgeId}`)
