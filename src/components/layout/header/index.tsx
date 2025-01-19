@@ -93,7 +93,12 @@ const Header: React.FC<{
             variant="body2"
             sx={{ color: "gray", fontWeight: "lighter" }}
           >
-            Monday, 19th August 2024.
+            {new Date().toLocaleDateString('en-US', {
+              weekday: 'long',
+              day: 'numeric',
+              month: 'long',
+              year: 'numeric',
+            })}
           </Typography>
         </Box>
 

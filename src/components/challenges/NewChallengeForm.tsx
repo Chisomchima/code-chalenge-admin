@@ -29,7 +29,7 @@ type FormData = {
 
 const NewChallengeForm: React.FC = () => {
   const [avatar, setAvatar] = React.useState<string | null>(null);
-  const { handleSubmit, control, setValue } = useForm<FormData>({
+  const { handleSubmit, control, setValue, trigger } = useForm<FormData>({
     defaultValues: {
       avatar: null,
       title: "",
@@ -70,16 +70,29 @@ const NewChallengeForm: React.FC = () => {
   } = useFieldArray({ control, name: "attachments" });
 
   const onSubmit = (data: FormData) => {
-    console.log("Form Data: ", data);
-    // Submit logic here (e.g., API call)
+    const payload = {
+      ...data,
+      acceptanceCriteria: data.acceptanceCriteria.map(
+        (item) => `${item.title}: ${item.description}`
+      ),
+      rules: data.rulesAndResources.map(
+        (item) => `${item.title}: ${item.description}`
+      ),
+      resources: data.onlineResources.map((item) => item.description),
+      avatar: data.avatar || "", // Ensure avatar is not null
+    };
+    console.log("xxxxx Transformed Payload: ", payload);
+
   };
+
 
   const renderMultiField = (
     fields: any[],
     append: (value: { title: string; description: string }) => void,
     remove: (index: number) => void,
     label: string,
-    name: string
+    name: string,
+    fieldLabel: { title: string; description: string }
   ) => (
     <>
       <Typography variant="h6" mt={3}>
@@ -90,11 +103,11 @@ const NewChallengeForm: React.FC = () => {
           <Controller
             name={`${name}.${index}.title` as any}
             control={control}
-            rules={{ required: 'required' }}
+            rules={{ required: `${fieldLabel.title} is required` }}
             render={({ field, fieldState: { error } }) => (
               <TextField
                 {...field}
-                label="Title"
+                label={fieldLabel.title}
                 fullWidth
                 margin="normal"
                 error={!!error}
@@ -105,11 +118,11 @@ const NewChallengeForm: React.FC = () => {
           <Controller
             name={`${name}.${index}.description` as any}
             control={control}
-            rules={{ required: 'required' }}
+            rules={{ required: `${fieldLabel.description} is required` }}
             render={({ field, fieldState: { error } }) => (
               <TextField
                 {...field}
-                label="Description"
+                label={fieldLabel.description}
                 fullWidth
                 margin="normal"
                 multiline
@@ -146,6 +159,7 @@ const NewChallengeForm: React.FC = () => {
       </Button>
     </>
   );
+
   return (
     <Box component="form" onSubmit={handleSubmit(onSubmit)}>
       <Box sx={{ position: "relative" }}>
@@ -208,8 +222,9 @@ const NewChallengeForm: React.FC = () => {
                   const reader = new FileReader();
                   reader.onload = () => {
                     const base64 = reader.result as string;
-                    setAvatar(base64); // Update local state
-                    setValue("avatar", base64); // Update form state
+                    setAvatar(base64);
+                    setValue("avatar", base64);
+                    trigger("avatar"); // Trigger validation
                   };
                   reader.readAsDataURL(file);
                 }
@@ -237,7 +252,7 @@ const NewChallengeForm: React.FC = () => {
         </Card>
       </Box>
 
-      <Box sx={{ marginTop: 10, overflowY: "auto", maxHeight: "70vh", mx: 5 }}>
+      <Box sx={{ marginTop: 10, overflowY: "auto", maxHeight: "70vh", mx: 5, py: 5 }}>
         <Grid container spacing={2}>
           <Grid item xs={3}>
             <Typography sx={{ mt: 2 }}>Title</Typography>
@@ -352,29 +367,34 @@ const NewChallengeForm: React.FC = () => {
           appendAcceptance,
           removeAcceptance,
           "Acceptance Criteria",
-          "acceptanceCriteria"
+          "acceptanceCriteria",
+          { title: "Acceptance Criterion Title", description: "Acceptance Criterion Description" }
         )}
         {renderMultiField(
           rulesFields,
           appendRules,
           removeRules,
           "Rules and Resources",
-          "rulesAndResources"
+          "rulesAndResources",
+          { title: "Rule/Resource Title", description: "Rule/Resource Description" }
         )}
         {renderMultiField(
           resourcesFields,
           appendResources,
           removeResources,
           "Online Resources",
-          "onlineResources"
+          "onlineResources",
+          { title: "Resource Title", description: "Resource Description" }
         )}
         {renderMultiField(
           attachmentsFields,
           appendAttachments,
           removeAttachments,
           "Attachments",
-          "attachments"
+          "attachments",
+          { title: "Attachment Title", description: "Attachment Description" }
         )}
+
 
       </Box>
     </Box>

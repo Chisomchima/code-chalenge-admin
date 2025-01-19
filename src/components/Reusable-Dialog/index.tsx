@@ -45,11 +45,12 @@ const AlertDialog: React.FC<AlertDialogProps> = ({
     >
       <Box
         sx={{
-          py: "20px",
+          py: "50px",
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
           flexDirection: "column",
+          px: { xs: "20px", sm: "50px" },
         }}
       >
         <DialogTitle id="alert-dialog-title">
