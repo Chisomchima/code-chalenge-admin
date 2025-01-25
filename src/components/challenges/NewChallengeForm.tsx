@@ -13,19 +13,9 @@ import {
 } from "@mui/material";
 import { useForm, Controller, useFieldArray } from "react-hook-form";
 import { Delete, Add } from "@mui/icons-material";
+import { FormData } from "./types";
 
-type FormData = {
-  avatar: string | null;
-  title: string;
-  description: string;
-  focusArea: string;
-  prerequisites: string;
-  skillLevel: string;
-  acceptanceCriteria: { title: string; description: string }[];
-  rulesAndResources: { title: string; description: string }[];
-  onlineResources: { title: string; description: string }[];
-  attachments: { title: string; description: string }[];
-};
+
 
 const NewChallengeForm: React.FC = () => {
   const [avatar, setAvatar] = React.useState<string | null>(null);
@@ -35,6 +25,7 @@ const NewChallengeForm: React.FC = () => {
       title: "",
       focusArea: "",
       prerequisites: "",
+      points: 0,
       skillLevel: "",
       description: "",
       acceptanceCriteria: [{ title: "", description: "" }],
@@ -356,6 +347,26 @@ const NewChallengeForm: React.FC = () => {
                   <MenuItem value="Project Management">Project Management</MenuItem>
                   <MenuItem value="DevOps">DevOps</MenuItem>
                 </TextField>
+              )}
+            />
+          </Grid>
+          <Grid item xs={3}>
+            <Typography sx={{ mt: 2 }}>Points</Typography>
+          </Grid>
+          <Grid item xs={9}>
+            <Controller
+              name="points"
+              control={control}
+              rules={{ required: "Points is required" }}
+              render={({ field, fieldState: { error } }) => (
+                <TextField
+                  {...field}
+                  type="number"
+                  fullWidth
+                  margin="normal"
+                  error={!!error}
+                  helperText={error ? error.message : null}
+                />
               )}
             />
           </Grid>
