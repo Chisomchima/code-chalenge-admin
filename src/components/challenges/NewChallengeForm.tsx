@@ -9,13 +9,20 @@ import {
   MenuItem,
   TextField,
   Typography,
-  Grid
+  Grid,
 } from "@mui/material";
 import { useForm, Controller, useFieldArray } from "react-hook-form";
 import { Delete, Add } from "@mui/icons-material";
 import { FormData } from "./types";
+import { toast } from "react-toastify";
+import { axiosInstance } from "../../utils/axiosInstance";
 
-
+interface PayloadData {
+  acceptanceCriteria: string[];
+  rules: string[];
+  resources: string[];
+  avatar: string;
+}
 
 const NewChallengeForm: React.FC = () => {
   const [avatar, setAvatar] = React.useState<string | null>(null);
@@ -60,22 +67,35 @@ const NewChallengeForm: React.FC = () => {
     remove: removeAttachments,
   } = useFieldArray({ control, name: "attachments" });
 
-  const onSubmit = (data: FormData) => {
-    const payload = {
-      ...data,
-      acceptanceCriteria: data.acceptanceCriteria.map(
-        (item) => `${item.title}: ${item.description}`
+  const onSubmit = async (data: FormData): Promise<void> => {
+    const { acceptanceCriteria, rulesAndResources, onlineResources, avatar } =
+      data;
+
+    const payload: PayloadData = {
+      acceptanceCriteria: acceptanceCriteria.map(
+        ({ title, description }) => `${title}: ${description}`
       ),
-      rules: data.rulesAndResources.map(
-        (item) => `${item.title}: ${item.description}`
+      rules: rulesAndResources.map(
+        ({ title, description }) => `${title}: ${description}`
       ),
-      resources: data.onlineResources.map((item) => item.description),
-      avatar: data.avatar || "", // Ensure avatar is not null
+      resources: onlineResources.map(({ description }) => description),
+      avatar: avatar ?? "", // Ensures avatar is always a string
     };
-    console.log("xxxxx Transformed Payload: ", payload);
 
+    console.log("Transformed Payload:", payload);
+
+    try {
+      const response = await axiosInstance.post(
+        "/api/challenges/create-challenge",
+        payload
+      );
+      console.log(response);
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : "An unknown error occurred";
+      toast.error(errorMessage);
+    }
   };
-
 
   const renderMultiField = (
     fields: any[],
@@ -190,7 +210,9 @@ const NewChallengeForm: React.FC = () => {
                     variant="rounded"
                     src={avatar || "https://via.placeholder.com/50"}
                     sx={{ width: 60, height: 60, cursor: "pointer" }}
-                    onClick={() => document.getElementById("avatar-upload")?.click()}
+                    onClick={() =>
+                      document.getElementById("avatar-upload")?.click()
+                    }
                   />
                   {error && (
                     <Typography color="error" variant="caption">
@@ -226,7 +248,6 @@ const NewChallengeForm: React.FC = () => {
           <Stack direction="row" spacing={1}>
             <Button
               color="primary"
-              onClick={handleSubmit(onSubmit)}
               variant="outlined"
               sx={{ textTransform: "initial", color: "black" }}
             >
@@ -234,6 +255,7 @@ const NewChallengeForm: React.FC = () => {
             </Button>
             <Button
               variant="contained"
+              onClick={handleSubmit(onSubmit)}
               sx={{ textTransform: "initial" }}
               color="primary"
             >
@@ -243,7 +265,15 @@ const NewChallengeForm: React.FC = () => {
         </Card>
       </Box>
 
-      <Box sx={{ marginTop: 10, overflowY: "auto", maxHeight: "70vh", mx: 5, py: 5 }}>
+      <Box
+        sx={{
+          marginTop: 10,
+          overflowY: "auto",
+          maxHeight: "70vh",
+          mx: 5,
+          py: 5,
+        }}
+      >
         <Grid container spacing={2}>
           <Grid item xs={3}>
             <Typography sx={{ mt: 2 }}>Title</Typography>
@@ -254,7 +284,10 @@ const NewChallengeForm: React.FC = () => {
               control={control}
               rules={{ required: "Title is required" }}
               render={({ field, fieldState: { error } }) => (
-                <TextField {...field} fullWidth margin="normal"
+                <TextField
+                  {...field}
+                  fullWidth
+                  margin="normal"
                   error={!!error}
                   helperText={error ? error.message : null}
                 />
@@ -292,7 +325,10 @@ const NewChallengeForm: React.FC = () => {
               control={control}
               rules={{ required: "Prerequisites are required" }}
               render={({ field, fieldState: { error } }) => (
-                <TextField {...field} fullWidth margin="normal"
+                <TextField
+                  {...field}
+                  fullWidth
+                  margin="normal"
                   error={!!error}
                   helperText={error ? error.message : null}
                 />
@@ -344,7 +380,9 @@ const NewChallengeForm: React.FC = () => {
                   <MenuItem value="Frontend">Frontend</MenuItem>
                   <MenuItem value="Backend">Backend</MenuItem>
                   <MenuItem value="Product Design">Product Design</MenuItem>
-                  <MenuItem value="Project Management">Project Management</MenuItem>
+                  <MenuItem value="Project Management">
+                    Project Management
+                  </MenuItem>
                   <MenuItem value="DevOps">DevOps</MenuItem>
                 </TextField>
               )}
@@ -370,7 +408,6 @@ const NewChallengeForm: React.FC = () => {
               )}
             />
           </Grid>
-
         </Grid>
 
         {renderMultiField(
@@ -379,7 +416,10 @@ const NewChallengeForm: React.FC = () => {
           removeAcceptance,
           "Acceptance Criteria",
           "acceptanceCriteria",
-          { title: "Acceptance Criterion Title", description: "Acceptance Criterion Description" }
+          {
+            title: "Acceptance Criterion Title",
+            description: "Acceptance Criterion Description",
+          }
         )}
         {renderMultiField(
           rulesFields,
@@ -387,7 +427,10 @@ const NewChallengeForm: React.FC = () => {
           removeRules,
           "Rules and Resources",
           "rulesAndResources",
-          { title: "Rule/Resource Title", description: "Rule/Resource Description" }
+          {
+            title: "Rule/Resource Title",
+            description: "Rule/Resource Description",
+          }
         )}
         {renderMultiField(
           resourcesFields,
@@ -405,8 +448,6 @@ const NewChallengeForm: React.FC = () => {
           "attachments",
           { title: "Attachment Title", description: "Attachment Description" }
         )}
-
-
       </Box>
     </Box>
   );
