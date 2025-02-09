@@ -9,16 +9,19 @@ import {
   MenuItem,
   TextField,
   Typography,
-  Grid
+  Grid,
 } from "@mui/material";
 import { useForm, Controller, useFieldArray } from "react-hook-form";
 import { Delete, Add } from "@mui/icons-material";
 import { FormData } from "./types";
-
-
+import { useCreateChallenge, useUploadChallengeAvatar } from "../../hooks/react-query/useChallenge";
+import Loader from "../ui/Loader";
 
 const NewChallengeForm: React.FC = () => {
   const [avatar, setAvatar] = React.useState<string | null>(null);
+  const [avatarUploaded, setAvatarUploaded] = React.useState<boolean>(false);
+  const { isLoading, mutateAsync: createChallenge } = useCreateChallenge();
+  const { isLoading: isAvatarLoading, mutateAsync: uploadAvatar } = useUploadChallengeAvatar();
   const { handleSubmit, control, setValue, trigger } = useForm<FormData>({
     defaultValues: {
       avatar: null,
@@ -60,22 +63,23 @@ const NewChallengeForm: React.FC = () => {
     remove: removeAttachments,
   } = useFieldArray({ control, name: "attachments" });
 
-  const onSubmit = (data: FormData) => {
+  const onSubmit = async (data: FormData) => {
     const payload = {
       ...data,
-      acceptanceCriteria: data.acceptanceCriteria.map(
-        (item) => `${item.title}: ${item.description}`
-      ),
+      acceptanceCriteria: data.acceptanceCriteria,
       rules: data.rulesAndResources.map(
         (item) => `${item.title}: ${item.description}`
       ),
       resources: data.onlineResources.map((item) => item.description),
-      avatar: data.avatar || "", // Ensure avatar is not null
     };
     console.log("xxxxx Transformed Payload: ", payload);
-
+    const { avatar, ...others} = payload
+    await createChallenge(others);
+    if (avatar && !avatarUploaded) {
+      await uploadAvatar(avatar);
+      setAvatarUploaded(true);
+    }
   };
-
 
   const renderMultiField = (
     fields: any[],
@@ -242,8 +246,16 @@ const NewChallengeForm: React.FC = () => {
           </Stack>
         </Card>
       </Box>
-
-      <Box sx={{ marginTop: 10, overflowY: "auto", maxHeight: "70vh", mx: 5, py: 5 }}>
+      {isLoading || isAvatarLoading && <Loader />}
+      <Box
+        sx={{
+          marginTop: 10,
+          overflowY: "auto",
+          maxHeight: "70vh",
+          mx: 5,
+          py: 5,
+        }}
+      >
         <Grid container spacing={2}>
           <Grid item xs={3}>
             <Typography sx={{ mt: 2 }}>Title</Typography>
@@ -254,7 +266,10 @@ const NewChallengeForm: React.FC = () => {
               control={control}
               rules={{ required: "Title is required" }}
               render={({ field, fieldState: { error } }) => (
-                <TextField {...field} fullWidth margin="normal"
+                <TextField
+                  {...field}
+                  fullWidth
+                  margin="normal"
                   error={!!error}
                   helperText={error ? error.message : null}
                 />
@@ -292,7 +307,10 @@ const NewChallengeForm: React.FC = () => {
               control={control}
               rules={{ required: "Prerequisites are required" }}
               render={({ field, fieldState: { error } }) => (
-                <TextField {...field} fullWidth margin="normal"
+                <TextField
+                  {...field}
+                  fullWidth
+                  margin="normal"
                   error={!!error}
                   helperText={error ? error.message : null}
                 />
@@ -342,10 +360,13 @@ const NewChallengeForm: React.FC = () => {
                   helperText={error ? error.message : null}
                 >
                   <MenuItem value="Frontend">Frontend</MenuItem>
-                  <MenuItem value="Backend">Backend</MenuItem>
-                  <MenuItem value="Product Design">Product Design</MenuItem>
-                  <MenuItem value="Project Management">Project Management</MenuItem>
+                  <MenuItem value="Fullstack">Fullstack</MenuItem>
+                  <MenuItem value="Mobile">Mobile</MenuItem>
                   <MenuItem value="DevOps">DevOps</MenuItem>
+                  <MenuItem value="UI/UX">UI/UX</MenuItem>
+                  <MenuItem value="Data Science">Data Science</MenuItem>
+                  <MenuItem value="Cyber Security">Cyber Security</MenuItem>
+                  <MenuItem value="Cloud Computing">Cloud Computing</MenuItem>
                 </TextField>
               )}
             />
@@ -370,7 +391,6 @@ const NewChallengeForm: React.FC = () => {
               )}
             />
           </Grid>
-
         </Grid>
 
         {renderMultiField(
@@ -379,7 +399,10 @@ const NewChallengeForm: React.FC = () => {
           removeAcceptance,
           "Acceptance Criteria",
           "acceptanceCriteria",
-          { title: "Acceptance Criterion Title", description: "Acceptance Criterion Description" }
+          {
+            title: "Acceptance Criterion Title",
+            description: "Acceptance Criterion Description",
+          }
         )}
         {renderMultiField(
           rulesFields,
@@ -387,7 +410,10 @@ const NewChallengeForm: React.FC = () => {
           removeRules,
           "Rules and Resources",
           "rulesAndResources",
-          { title: "Rule/Resource Title", description: "Rule/Resource Description" }
+          {
+            title: "Rule/Resource Title",
+            description: "Rule/Resource Description",
+          }
         )}
         {renderMultiField(
           resourcesFields,
@@ -405,8 +431,6 @@ const NewChallengeForm: React.FC = () => {
           "attachments",
           { title: "Attachment Title", description: "Attachment Description" }
         )}
-
-
       </Box>
     </Box>
   );
