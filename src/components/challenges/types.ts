@@ -1,4 +1,4 @@
-export type FormData = {
+export type ChallengeData = {
   avatar: string | null;
   title: string;
   description: string;

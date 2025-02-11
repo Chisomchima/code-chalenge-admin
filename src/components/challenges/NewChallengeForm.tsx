@@ -13,16 +13,24 @@ import {
 } from "@mui/material";
 import { useForm, Controller, useFieldArray } from "react-hook-form";
 import { Delete, Add } from "@mui/icons-material";
-import { FormData } from "./types";
-import { useCreateChallenge, useUploadChallengeAvatar } from "../../hooks/react-query/useChallenge";
+import { ChallengeData } from "./types";
+import {
+  useCreateChallenge,
+  useUploadChallengeAvatar,
+} from "../../hooks/react-query/useChallenge";
 import Loader from "../ui/Loader";
 
 const NewChallengeForm: React.FC = () => {
   const [avatar, setAvatar] = React.useState<string | null>(null);
   const [avatarUploaded, setAvatarUploaded] = React.useState<boolean>(false);
-  const { isLoading, mutateAsync: createChallenge } = useCreateChallenge();
-  const { isLoading: isAvatarLoading, mutateAsync: uploadAvatar } = useUploadChallengeAvatar();
-  const { handleSubmit, control, setValue, trigger } = useForm<FormData>({
+  const {
+    isLoading,
+    mutateAsync: createChallenge,
+    data: challengeCreationData,
+  } = useCreateChallenge();
+  const { isLoading: isAvatarLoading, mutateAsync: uploadAvatar } =
+    useUploadChallengeAvatar();
+  const { handleSubmit, control, setValue, trigger } = useForm<ChallengeData>({
     defaultValues: {
       avatar: null,
       title: "",
@@ -63,7 +71,8 @@ const NewChallengeForm: React.FC = () => {
     remove: removeAttachments,
   } = useFieldArray({ control, name: "attachments" });
 
-  const onSubmit = async (data: FormData) => {
+  const onSubmit = async (data: ChallengeData) => {
+    const formData = new FormData();
     const payload = {
       ...data,
       acceptanceCriteria: data.acceptanceCriteria,
@@ -73,10 +82,12 @@ const NewChallengeForm: React.FC = () => {
       resources: data.onlineResources.map((item) => item.description),
     };
     console.log("xxxxx Transformed Payload: ", payload);
-    const { avatar, ...others} = payload
+    const { avatar, ...others } = payload;
     await createChallenge(others);
-    if (avatar && !avatarUploaded) {
-      await uploadAvatar(avatar);
+    if (avatar && !avatarUploaded && challengeCreationData.success) {
+      formData.append("id", challengeCreationData?.id);
+      formData.append("image", avatar);
+      await uploadAvatar(formData);
       setAvatarUploaded(true);
     }
   };
@@ -194,7 +205,9 @@ const NewChallengeForm: React.FC = () => {
                     variant="rounded"
                     src={avatar || "https://via.placeholder.com/50"}
                     sx={{ width: 60, height: 60, cursor: "pointer" }}
-                    onClick={() => document.getElementById("avatar-upload")?.click()}
+                    onClick={() =>
+                      document.getElementById("avatar-upload")?.click()
+                    }
                   />
                   {error && (
                     <Typography color="error" variant="caption">
@@ -246,7 +259,7 @@ const NewChallengeForm: React.FC = () => {
           </Stack>
         </Card>
       </Box>
-      {isLoading || isAvatarLoading && <Loader />}
+      {isLoading || (isAvatarLoading && <Loader />)}
       <Box
         sx={{
           marginTop: 10,
