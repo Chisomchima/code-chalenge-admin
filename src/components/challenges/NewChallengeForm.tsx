@@ -21,15 +21,13 @@ import {
 import Loader from "../ui/Loader";
 
 const NewChallengeForm: React.FC = () => {
-  const [avatar, setAvatar] = React.useState<string | null>(null);
+  const [avatar, setAvatar] = React.useState<File | null>(null);
   const [avatarUploaded, setAvatarUploaded] = React.useState<boolean>(false);
-  const {
-    isLoading,
-    mutateAsync: createChallenge,
-    data: challengeCreationData,
-  } = useCreateChallenge();
+  const { isLoading, mutateAsync: createChallenge } = useCreateChallenge();
+
   const { isLoading: isAvatarLoading, mutateAsync: uploadAvatar } =
     useUploadChallengeAvatar();
+
   const { handleSubmit, control, setValue, trigger } = useForm<ChallengeData>({
     defaultValues: {
       avatar: null,
@@ -81,11 +79,12 @@ const NewChallengeForm: React.FC = () => {
       ),
       resources: data.onlineResources.map((item) => item.description),
     };
-    console.log("xxxxx Transformed Payload: ", payload);
+
     const { avatar, ...others } = payload;
-    await createChallenge(others);
-    if (avatar && !avatarUploaded && challengeCreationData.success) {
-      formData.append("id", challengeCreationData?.id);
+    const challengeResponse = await createChallenge(others);
+
+    if (avatar && !avatarUploaded && challengeResponse?.success) {
+      formData.append("id", challengeResponse?.content?.challengeID);
       formData.append("image", avatar);
       await uploadAvatar(formData);
       setAvatarUploaded(true);
@@ -199,11 +198,15 @@ const NewChallengeForm: React.FC = () => {
               name="avatar"
               control={control}
               rules={{ required: "Avatar is required" }}
-              render={({ field, fieldState: { error } }) => (
+              render={({ fieldState: { error } }) => (
                 <>
                   <Avatar
                     variant="rounded"
-                    src={avatar || "https://via.placeholder.com/50"}
+                    src={
+                      avatar
+                        ? URL.createObjectURL(avatar)
+                        : "https://via.placeholder.com/50"
+                    }
                     sx={{ width: 60, height: 60, cursor: "pointer" }}
                     onClick={() =>
                       document.getElementById("avatar-upload")?.click()
@@ -227,14 +230,9 @@ const NewChallengeForm: React.FC = () => {
               onChange={(e) => {
                 if (e.target.files && e.target.files[0]) {
                   const file = e.target.files[0];
-                  const reader = new FileReader();
-                  reader.onload = () => {
-                    const base64 = reader.result as string;
-                    setAvatar(base64);
-                    setValue("avatar", base64);
-                    trigger("avatar"); // Trigger validation
-                  };
-                  reader.readAsDataURL(file);
+                  setAvatar(file);
+                  setValue("avatar", file);
+                  trigger("avatar");
                 }
               }}
             />
@@ -248,13 +246,6 @@ const NewChallengeForm: React.FC = () => {
               sx={{ textTransform: "initial", color: "black" }}
             >
               Draft for Later
-            </Button>
-            <Button
-              variant="contained"
-              sx={{ textTransform: "initial" }}
-              color="primary"
-            >
-              Publish Challenge
             </Button>
           </Stack>
         </Card>
@@ -384,6 +375,9 @@ const NewChallengeForm: React.FC = () => {
               )}
             />
           </Grid>
+
+          {isLoading && <Loader />}
+
           <Grid item xs={3}>
             <Typography sx={{ mt: 2 }}>Points</Typography>
           </Grid>

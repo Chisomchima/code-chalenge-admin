@@ -1,5 +1,5 @@
 export type ChallengeData = {
-  avatar: string | null;
+  avatar: File | null;
   title: string;
   description: string;
   focusArea: string;
