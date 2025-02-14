@@ -6,10 +6,8 @@ import {
   Box,
   Button,
   IconButton,
-  MenuItem,
-  TextField,
   Typography,
-  Grid,
+  TextField,
 } from "@mui/material";
 import { useForm, Controller, useFieldArray } from "react-hook-form";
 import { Delete, Add } from "@mui/icons-material";
@@ -19,6 +17,8 @@ import {
   useUploadChallengeAvatar,
 } from "../../hooks/react-query/useChallenge";
 import Loader from "../ui/Loader";
+import FormField from "./FormField";
+import { focusAreas, skillLevels } from "../../utils/constant";
 
 const NewChallengeForm: React.FC = () => {
   const [avatar, setAvatar] = React.useState<File | null>(null);
@@ -71,16 +71,7 @@ const NewChallengeForm: React.FC = () => {
 
   const onSubmit = async (data: ChallengeData) => {
     const formData = new FormData();
-    const payload = {
-      ...data,
-      acceptanceCriteria: data.acceptanceCriteria,
-      rules: data.rulesAndResources.map(
-        (item) => `${item.title}: ${item.description}`
-      ),
-      resources: data.onlineResources.map((item) => item.description),
-    };
-
-    const { avatar, ...others } = payload;
+    const { avatar, ...others } = data;
     const challengeResponse = await createChallenge(others);
 
     if (avatar && !avatarUploaded && challengeResponse?.success) {
@@ -250,7 +241,7 @@ const NewChallengeForm: React.FC = () => {
           </Stack>
         </Card>
       </Box>
-      {isLoading || (isAvatarLoading && <Loader />)}
+      {isLoading && <Loader />}
       <Box
         sx={{
           marginTop: 10,
@@ -260,145 +251,48 @@ const NewChallengeForm: React.FC = () => {
           py: 5,
         }}
       >
-        <Grid container spacing={2}>
-          <Grid item xs={3}>
-            <Typography sx={{ mt: 2 }}>Title</Typography>
-          </Grid>
-          <Grid item xs={9}>
-            <Controller
-              name="title"
-              control={control}
-              rules={{ required: "Title is required" }}
-              render={({ field, fieldState: { error } }) => (
-                <TextField
-                  {...field}
-                  fullWidth
-                  margin="normal"
-                  error={!!error}
-                  helperText={error ? error.message : null}
-                />
-              )}
-            />
-          </Grid>
-          <Grid item xs={3}>
-            <Typography sx={{ mt: 2 }}>Description</Typography>
-          </Grid>
-          <Grid item xs={9}>
-            <Controller
-              name="description"
-              rules={{ required: "Description is required" }}
-              control={control}
-              render={({ field, fieldState: { error } }) => (
-                <TextField
-                  {...field}
-                  fullWidth
-                  margin="normal"
-                  multiline
-                  rows={3}
-                  error={!!error}
-                  helperText={error ? error.message : null}
-                />
-              )}
-            />
-          </Grid>
-
-          <Grid item xs={3}>
-            <Typography sx={{ mt: 2 }}>Prerequisites</Typography>
-          </Grid>
-          <Grid item xs={9}>
-            <Controller
-              name="prerequisites"
-              control={control}
-              rules={{ required: "Prerequisites are required" }}
-              render={({ field, fieldState: { error } }) => (
-                <TextField
-                  {...field}
-                  fullWidth
-                  margin="normal"
-                  error={!!error}
-                  helperText={error ? error.message : null}
-                />
-              )}
-            />
-          </Grid>
-
-          <Grid item xs={3}>
-            <Typography sx={{ mt: 2 }}>Skill Level</Typography>
-          </Grid>
-          <Grid item xs={9}>
-            <Controller
-              name="skillLevel"
-              control={control}
-              rules={{ required: "Skill Level is required" }}
-              render={({ field, fieldState: { error } }) => (
-                <TextField
-                  {...field}
-                  fullWidth
-                  margin="normal"
-                  select
-                  error={!!error}
-                  helperText={error ? error.message : null}
-                >
-                  <MenuItem value="Beginner">Beginner</MenuItem>
-                  <MenuItem value="Intermediate">Intermediate</MenuItem>
-                  <MenuItem value="Advanced">Advanced</MenuItem>
-                </TextField>
-              )}
-            />
-          </Grid>
-          <Grid item xs={3}>
-            <Typography sx={{ mt: 2 }}>Focus Area</Typography>
-          </Grid>
-          <Grid item xs={9}>
-            <Controller
-              name="focusArea"
-              control={control}
-              rules={{ required: "Focus Area is required" }}
-              render={({ field, fieldState: { error } }) => (
-                <TextField
-                  {...field}
-                  fullWidth
-                  margin="normal"
-                  select
-                  error={!!error}
-                  helperText={error ? error.message : null}
-                >
-                  <MenuItem value="Frontend">Frontend</MenuItem>
-                  <MenuItem value="Fullstack">Fullstack</MenuItem>
-                  <MenuItem value="Mobile">Mobile</MenuItem>
-                  <MenuItem value="DevOps">DevOps</MenuItem>
-                  <MenuItem value="UI/UX">UI/UX</MenuItem>
-                  <MenuItem value="Data Science">Data Science</MenuItem>
-                  <MenuItem value="Cyber Security">Cyber Security</MenuItem>
-                  <MenuItem value="Cloud Computing">Cloud Computing</MenuItem>
-                </TextField>
-              )}
-            />
-          </Grid>
-
-          {isLoading && <Loader />}
-
-          <Grid item xs={3}>
-            <Typography sx={{ mt: 2 }}>Points</Typography>
-          </Grid>
-          <Grid item xs={9}>
-            <Controller
-              name="points"
-              control={control}
-              rules={{ required: "Points is required" }}
-              render={({ field, fieldState: { error } }) => (
-                <TextField
-                  {...field}
-                  type="number"
-                  fullWidth
-                  margin="normal"
-                  error={!!error}
-                  helperText={error ? error.message : null}
-                />
-              )}
-            />
-          </Grid>
-        </Grid>
+        <FormField
+          name="title"
+          control={control}
+          rules={{ required: "Title is required" }}
+          label="Title"
+        />
+        <FormField
+          name="description"
+          control={control}
+          rules={{ required: "Description is required" }}
+          label="Description"
+          multiline
+          rows={3}
+        />
+        <FormField
+          name="prerequisites"
+          control={control}
+          rules={{ required: "Prerequisites are required" }}
+          label="Prerequisites"
+        />
+        <FormField
+          name="skillLevel"
+          control={control}
+          rules={{ required: "Skill Level is required" }}
+          label="Skill Level"
+          options={skillLevels}
+          placeholder="Select Skill Level"
+        />
+        <FormField
+          name="focusArea"
+          control={control}
+          rules={{ required: "Focus Area is required" }}
+          label="Focus Area"
+          options={focusAreas}
+        />
+        <FormField
+          name="points"
+          control={control}
+          rules={{ required: "Points is required" }}
+          label="Points"
+          type="number"
+        />
 
         {renderMultiField(
           acceptanceFields,

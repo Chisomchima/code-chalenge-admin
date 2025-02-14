@@ -407,6 +407,19 @@ const AllChallengesTable: React.FC = () => {
                         size: "small",
                       }}
                     >
+                      Published Challenge
+                    </MenuItem>
+                    <MenuItem
+                      onClick={handleClose}
+                      sx={{
+                        "&:hover": {
+                          backgroundColor: "rgba(0, 0, 0, 0.04)",
+                          transition: "background-color 0.2s ease",
+                        },
+                        fontWeight: "lighter",
+                        size: "small",
+                      }}
+                    >
                       View Challenge
                     </MenuItem>
                     <MenuItem
