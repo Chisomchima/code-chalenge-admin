@@ -38,7 +38,7 @@ const UsersPage = () => {
                   </div>
                   <div>
                     <div className="font-semibold font-inter text-sm flex items-center gap-2">
-                      <span className="block">{row.name}</span>
+                      <span className="block truncate">{row.name}</span>
                       {row.role.toLowerCase() === "mentor" && (
                         <div className="ring-1 ring-co-primary py-[0.5] px-2 rounded-full text-co-primary text-xs">
                           {row.role}
