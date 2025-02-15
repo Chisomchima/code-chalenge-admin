@@ -105,10 +105,10 @@ const AllChallengesTable: React.FC = () => {
     if (selectedChallengeId) {
       deleteChallenge(selectedChallengeId, {
         onSuccess: () => {
-          handleClose();
           refetch();
         },
       });
+      handleClose();
     }
   };
 
