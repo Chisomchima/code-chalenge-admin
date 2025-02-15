@@ -79,7 +79,7 @@ const UsersTable = ({
               {tableHead.map((data, index) => (
                 <TableCell
                   key={index}
-                  className="!font-normal !font-inter !text-gray-500"
+                  className="!font-normal truncate !font-inter !text-gray-500"
                 >
                   {data}
                 </TableCell>
