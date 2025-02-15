@@ -1,4 +1,3 @@
-import React, { useEffect } from "react";
 import {
   Box,
   Typography,
@@ -20,14 +19,6 @@ const Header: React.FC<{
   openLargeClick: () => void;
 }> = ({ large }) => {
   const location = useLocation();
-
-  useEffect(() => {
-    const currentPath = location.pathname.split("/")[1];
-
-    if (currentPath === "challenges") {
-      console.log("We are on the Challenges page!");
-    }
-  }, [location]);
 
   const getHeaderTitle = (path: string): string => {
     const firstPath = path.split("/")[1];
