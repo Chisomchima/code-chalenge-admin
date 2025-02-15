@@ -22,10 +22,9 @@ import { focusAreas, skillLevels } from "../../utils/constant";
 
 const NewChallengeForm: React.FC = () => {
   const [avatar, setAvatar] = React.useState<File | null>(null);
-  const [avatarUploaded, setAvatarUploaded] = React.useState<boolean>(false);
   const { isLoading, mutateAsync: createChallenge } = useCreateChallenge();
 
-  const { isLoading: isAvatarLoading, mutateAsync: uploadAvatar } =
+  const { isLoading: avatarLoading, mutateAsync: uploadAvatar } =
     useUploadChallengeAvatar();
 
   const { handleSubmit, control, setValue, trigger } = useForm<ChallengeData>({
@@ -74,11 +73,10 @@ const NewChallengeForm: React.FC = () => {
     const { avatar, ...others } = data;
     const challengeResponse = await createChallenge(others);
 
-    if (avatar && !avatarUploaded && challengeResponse?.success) {
+    if (avatar && challengeResponse?.success) {
       formData.append("id", challengeResponse?.content?.challengeID);
       formData.append("image", avatar);
       await uploadAvatar(formData);
-      setAvatarUploaded(true);
     }
   };
 
