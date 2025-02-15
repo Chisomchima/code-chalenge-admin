@@ -39,7 +39,7 @@ const AllChallengesTable: React.FC = () => {
   const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
 
-  const { data: challengesData, isLoading } = useGetAllChallenges("published");
+  const { data: challengesData, isLoading } = useGetAllChallenges("all");
 
   const challenges: MappedChallenge[] =
     challengesData?.content?.map((el: TGetAllChallenge) => ({
