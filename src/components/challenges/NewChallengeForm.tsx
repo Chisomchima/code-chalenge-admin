@@ -6,27 +6,27 @@ import {
   Box,
   Button,
   IconButton,
-  MenuItem,
-  TextField,
   Typography,
-  Grid,
+  TextField,
 } from "@mui/material";
 import { useForm, Controller, useFieldArray } from "react-hook-form";
 import { Delete, Add } from "@mui/icons-material";
-import { FormData } from "./types";
-import { toast } from "react-toastify";
-import { axiosInstance } from "../../utils/axiosInstance";
-
-interface PayloadData {
-  acceptanceCriteria: string[];
-  rules: string[];
-  resources: string[];
-  avatar: string;
-}
+import { ChallengeData } from "./types";
+import {
+  useCreateChallenge,
+  useUploadChallengeAvatar,
+} from "../../hooks/react-query/useChallenge";
+import Loader from "../ui/Loader";
+import FormField from "./FormField";
+import { focusAreas, skillLevels } from "../../utils/constant";
 
 const NewChallengeForm: React.FC = () => {
-  const [avatar, setAvatar] = React.useState<string | null>(null);
-  const { handleSubmit, control, setValue, trigger } = useForm<FormData>({
+  const [avatar, setAvatar] = React.useState<File | null>(null);
+  const { isLoading, mutateAsync: createChallenge } = useCreateChallenge();
+
+  const { mutateAsync: uploadAvatar } = useUploadChallengeAvatar();
+
+  const { handleSubmit, control, setValue, trigger } = useForm<ChallengeData>({
     defaultValues: {
       avatar: null,
       title: "",
@@ -67,33 +67,15 @@ const NewChallengeForm: React.FC = () => {
     remove: removeAttachments,
   } = useFieldArray({ control, name: "attachments" });
 
-  const onSubmit = async (data: FormData): Promise<void> => {
-    const { acceptanceCriteria, rulesAndResources, onlineResources, avatar } =
-      data;
+  const onSubmit = async (data: ChallengeData) => {
+    const formData = new FormData();
+    const { avatar, ...others } = data;
+    const challengeResponse = await createChallenge(others);
 
-    const payload: PayloadData = {
-      acceptanceCriteria: acceptanceCriteria.map(
-        ({ title, description }) => `${title}: ${description}`
-      ),
-      rules: rulesAndResources.map(
-        ({ title, description }) => `${title}: ${description}`
-      ),
-      resources: onlineResources.map(({ description }) => description),
-      avatar: avatar ?? "", // Ensures avatar is always a string
-    };
-
-    console.log("Transformed Payload:", payload);
-
-    try {
-      const response = await axiosInstance.post(
-        "/api/challenges/create-challenge",
-        payload
-      );
-      console.log(response);
-    } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : "An unknown error occurred";
-      toast.error(errorMessage);
+    if (avatar && challengeResponse?.success) {
+      formData.append("id", challengeResponse?.content?.challengeID);
+      formData.append("image", avatar);
+      await uploadAvatar(formData);
     }
   };
 
@@ -204,11 +186,15 @@ const NewChallengeForm: React.FC = () => {
               name="avatar"
               control={control}
               rules={{ required: "Avatar is required" }}
-              render={({ field, fieldState: { error } }) => (
+              render={({ fieldState: { error } }) => (
                 <>
                   <Avatar
                     variant="rounded"
-                    src={avatar || "https://via.placeholder.com/50"}
+                    src={
+                      avatar
+                        ? URL.createObjectURL(avatar)
+                        : "https://via.placeholder.com/50"
+                    }
                     sx={{ width: 60, height: 60, cursor: "pointer" }}
                     onClick={() =>
                       document.getElementById("avatar-upload")?.click()
@@ -232,14 +218,9 @@ const NewChallengeForm: React.FC = () => {
               onChange={(e) => {
                 if (e.target.files && e.target.files[0]) {
                   const file = e.target.files[0];
-                  const reader = new FileReader();
-                  reader.onload = () => {
-                    const base64 = reader.result as string;
-                    setAvatar(base64);
-                    setValue("avatar", base64);
-                    trigger("avatar"); // Trigger validation
-                  };
-                  reader.readAsDataURL(file);
+                  setAvatar(file);
+                  setValue("avatar", file);
+                  trigger("avatar");
                 }
               }}
             />
@@ -253,18 +234,10 @@ const NewChallengeForm: React.FC = () => {
             >
               Draft for Later
             </Button>
-            <Button
-              variant="contained"
-              onClick={handleSubmit(onSubmit)}
-              sx={{ textTransform: "initial" }}
-              color="primary"
-            >
-              Publish Challenge
-            </Button>
           </Stack>
         </Card>
       </Box>
-
+      {isLoading && <Loader />}
       <Box
         sx={{
           marginTop: 10,
@@ -274,141 +247,48 @@ const NewChallengeForm: React.FC = () => {
           py: 5,
         }}
       >
-        <Grid container spacing={2}>
-          <Grid item xs={3}>
-            <Typography sx={{ mt: 2 }}>Title</Typography>
-          </Grid>
-          <Grid item xs={9}>
-            <Controller
-              name="title"
-              control={control}
-              rules={{ required: "Title is required" }}
-              render={({ field, fieldState: { error } }) => (
-                <TextField
-                  {...field}
-                  fullWidth
-                  margin="normal"
-                  error={!!error}
-                  helperText={error ? error.message : null}
-                />
-              )}
-            />
-          </Grid>
-          <Grid item xs={3}>
-            <Typography sx={{ mt: 2 }}>Description</Typography>
-          </Grid>
-          <Grid item xs={9}>
-            <Controller
-              name="description"
-              rules={{ required: "Description is required" }}
-              control={control}
-              render={({ field, fieldState: { error } }) => (
-                <TextField
-                  {...field}
-                  fullWidth
-                  margin="normal"
-                  multiline
-                  rows={3}
-                  error={!!error}
-                  helperText={error ? error.message : null}
-                />
-              )}
-            />
-          </Grid>
-
-          <Grid item xs={3}>
-            <Typography sx={{ mt: 2 }}>Prerequisites</Typography>
-          </Grid>
-          <Grid item xs={9}>
-            <Controller
-              name="prerequisites"
-              control={control}
-              rules={{ required: "Prerequisites are required" }}
-              render={({ field, fieldState: { error } }) => (
-                <TextField
-                  {...field}
-                  fullWidth
-                  margin="normal"
-                  error={!!error}
-                  helperText={error ? error.message : null}
-                />
-              )}
-            />
-          </Grid>
-
-          <Grid item xs={3}>
-            <Typography sx={{ mt: 2 }}>Skill Level</Typography>
-          </Grid>
-          <Grid item xs={9}>
-            <Controller
-              name="skillLevel"
-              control={control}
-              rules={{ required: "Skill Level is required" }}
-              render={({ field, fieldState: { error } }) => (
-                <TextField
-                  {...field}
-                  fullWidth
-                  margin="normal"
-                  select
-                  error={!!error}
-                  helperText={error ? error.message : null}
-                >
-                  <MenuItem value="Beginner">Beginner</MenuItem>
-                  <MenuItem value="Intermediate">Intermediate</MenuItem>
-                  <MenuItem value="Advanced">Advanced</MenuItem>
-                </TextField>
-              )}
-            />
-          </Grid>
-          <Grid item xs={3}>
-            <Typography sx={{ mt: 2 }}>Focus Area</Typography>
-          </Grid>
-          <Grid item xs={9}>
-            <Controller
-              name="focusArea"
-              control={control}
-              rules={{ required: "Focus Area is required" }}
-              render={({ field, fieldState: { error } }) => (
-                <TextField
-                  {...field}
-                  fullWidth
-                  margin="normal"
-                  select
-                  error={!!error}
-                  helperText={error ? error.message : null}
-                >
-                  <MenuItem value="Frontend">Frontend</MenuItem>
-                  <MenuItem value="Backend">Backend</MenuItem>
-                  <MenuItem value="Product Design">Product Design</MenuItem>
-                  <MenuItem value="Project Management">
-                    Project Management
-                  </MenuItem>
-                  <MenuItem value="DevOps">DevOps</MenuItem>
-                </TextField>
-              )}
-            />
-          </Grid>
-          <Grid item xs={3}>
-            <Typography sx={{ mt: 2 }}>Points</Typography>
-          </Grid>
-          <Grid item xs={9}>
-            <Controller
-              name="points"
-              control={control}
-              rules={{ required: "Points is required" }}
-              render={({ field, fieldState: { error } }) => (
-                <TextField
-                  {...field}
-                  type="number"
-                  fullWidth
-                  margin="normal"
-                  error={!!error}
-                  helperText={error ? error.message : null}
-                />
-              )}
-            />
-          </Grid>
-        </Grid>
+        <FormField
+          name="title"
+          control={control}
+          rules={{ required: "Title is required" }}
+          label="Title"
+        />
+        <FormField
+          name="description"
+          control={control}
+          rules={{ required: "Description is required" }}
+          label="Description"
+          multiline
+          rows={3}
+        />
+        <FormField
+          name="prerequisites"
+          control={control}
+          rules={{ required: "Prerequisites are required" }}
+          label="Prerequisites"
+        />
+        <FormField
+          name="skillLevel"
+          control={control}
+          rules={{ required: "Skill Level is required" }}
+          label="Skill Level"
+          options={skillLevels}
+          placeholder="Select Skill Level"
+        />
+        <FormField
+          name="focusArea"
+          control={control}
+          rules={{ required: "Focus Area is required" }}
+          label="Focus Area"
+          options={focusAreas}
+        />
+        <FormField
+          name="points"
+          control={control}
+          rules={{ required: "Points is required" }}
+          label="Points"
+          type="number"
+        />
 
         {renderMultiField(
           acceptanceFields,

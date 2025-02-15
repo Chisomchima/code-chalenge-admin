@@ -10,8 +10,8 @@ import {
 import SearchIcon from "@mui/icons-material/Search";
 import { IoNotificationsCircleOutline } from "react-icons/io5";
 import { useLocation } from "react-router-dom";
+import Cookies from "js-cookie";
 import { Navigation } from "../../../utils/Enums";
-import Cookies from 'js-cookie'
 
 const Header: React.FC<{
   small: boolean;
@@ -22,7 +22,7 @@ const Header: React.FC<{
   const location = useLocation();
 
   useEffect(() => {
-    const currentPath = location.pathname.split('/')[1];
+    const currentPath = location.pathname.split("/")[1];
 
     if (currentPath === "challenges") {
       console.log("We are on the Challenges page!");
@@ -30,7 +30,7 @@ const Header: React.FC<{
   }, [location]);
 
   const getHeaderTitle = (path: string): string => {
-    const firstPath = path.split('/')[1];
+    const firstPath = path.split("/")[1];
     switch (firstPath) {
       case "":
         return Navigation.Dashboard;
@@ -47,7 +47,7 @@ const Header: React.FC<{
     }
   };
 
-  const profile = Cookies.get('adminProfile')
+  const profile = Cookies.get("adminProfile");
   let firstName = "";
   let lastName = "";
   if (profile) {
@@ -93,11 +93,11 @@ const Header: React.FC<{
             variant="body2"
             sx={{ color: "gray", fontWeight: "lighter" }}
           >
-            {new Date().toLocaleDateString('en-US', {
-              weekday: 'long',
-              day: 'numeric',
-              month: 'long',
-              year: 'numeric',
+            {new Date().toLocaleDateString("en-US", {
+              weekday: "long",
+              day: "numeric",
+              month: "long",
+              year: "numeric",
             })}
           </Typography>
         </Box>
