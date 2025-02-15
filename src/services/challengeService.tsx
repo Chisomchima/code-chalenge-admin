@@ -1,8 +1,9 @@
 import { AxiosError } from "axios";
 import { axiosInstance, handleError } from "../utils/axiosInstance";
 import { toast } from "react-toastify";
+import { ChallengeData } from "../components/challenges/types";
 
-export const CreateChallenge = async (data: any) => {
+export const CreateChallenge = async (data: ChallengeData) => {
   try {
     const response = await axiosInstance.post(
       "/api/admin/create-challenge",
@@ -13,6 +14,19 @@ export const CreateChallenge = async (data: any) => {
   } catch (error) {
     handleError(error as AxiosError, "An unexpected error occurred.");
     toast.error("Failed to create challenge.");
+    throw error;
+  }
+};
+
+export const GetAllChallenges = async (param: string) => {
+  try {
+    const response = await axiosInstance.get(
+      `/api/challenges/get-challenges/${param}`
+    );
+    return response.data;
+  } catch (error) {
+    handleError(error as AxiosError, "An unexpected error occurred.");
+    toast.error("Failed to get challenges.");
     throw error;
   }
 };

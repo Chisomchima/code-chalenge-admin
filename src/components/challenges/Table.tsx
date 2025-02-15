@@ -17,174 +17,21 @@ import {
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import SearchIcon from "@mui/icons-material/Search";
 import { useNavigate } from "react-router-dom";
-// Clean dataset
-const data = [
-  {
-    name: "Build a Portfolio Website",
-    status: "Draft",
-    type: "Front End",
-    completionTime: "0.32 hrs",
-    completionRate: "89%",
-    participants: 450,
-    points: "50pts",
-    createDate: "01/12/2024",
-    logo: "https://avatars.githubusercontent.com/u/68823331?v=4",
-  },
-  {
-    name: "Build a Portfolio Website",
-    status: "Published",
-    type: "Front End",
-    completionTime: "0.32 hrs",
-    completionRate: "89%",
-    participants: 450,
-    points: "50pts",
-    createDate: "01/12/2024",
-    logo: "https://avatars.githubusercontent.com/u/68823331?v=4",
-  },
-  {
-    name: "Build a Portfolio Website",
-    status: "Draft",
-    type: "Back End",
-    completionTime: "0.32 hrs",
-    completionRate: "89%",
-    participants: 450,
-    points: "50pts",
-    createDate: "01/12/2024",
-    logo: "https://avatars.githubusercontent.com/u/68823331?v=4",
-  },
-  {
-    name: "Build a Portfolio Website",
-    status: "Published",
-    type: "Back End",
-    completionTime: "0.32 hrs",
-    completionRate: "89%",
-    participants: 450,
-    points: "50pts",
-    createDate: "01/12/2024",
-    logo: "https://avatars.githubusercontent.com/u/68823331?v=4",
-  },
-  {
-    name: "Build a Portfolio Website",
-    status: "Published",
-    type: "Design",
-    completionTime: "0.32 hrs",
-    completionRate: "89%",
-    participants: 450,
-    points: "50pts",
-    createDate: "01/12/2024",
-    logo: "https://avatars.githubusercontent.com/u/68823331?v=4",
-  },
-  {
-    name: "Build a Portfolio Website",
-    status: "Draft",
-    type: "Front End",
-    completionTime: "0.32 hrs",
-    completionRate: "89%",
-    participants: 450,
-    points: "50pts",
-    createDate: "01/12/2024",
-    logo: "https://avatars.githubusercontent.com/u/68823331?v=4",
-  },
-  {
-    name: "Build a Portfolio Website",
-    status: "Published",
-    type: "Front End",
-    completionTime: "0.32 hrs",
-    completionRate: "89%",
-    participants: 450,
-    points: "50pts",
-    createDate: "01/12/2024",
-    logo: "https://avatars.githubusercontent.com/u/68823331?v=4",
-  },
-  {
-    name: "Build a Portfolio Website",
-    status: "Draft",
-    type: "Back End",
-    completionTime: "0.32 hrs",
-    completionRate: "89%",
-    participants: 450,
-    points: "50pts",
-    createDate: "01/12/2024",
-    logo: "https://avatars.githubusercontent.com/u/68823331?v=4",
-  },
-  {
-    name: "Build a Portfolio Website",
-    status: "Published",
-    type: "Back End",
-    completionTime: "0.32 hrs",
-    completionRate: "89%",
-    participants: 450,
-    points: "50pts",
-    createDate: "01/12/2024",
-    logo: "https://avatars.githubusercontent.com/u/68823331?v=4",
-  },
-  {
-    name: "Build a Portfolio Website",
-    status: "Published",
-    type: "Design",
-    completionTime: "0.32 hrs",
-    completionRate: "89%",
-    participants: 450,
-    points: "50pts",
-    createDate: "01/12/2024",
-    logo: "https://avatars.githubusercontent.com/u/68823331?v=4",
-  },
-  {
-    name: "Create a Mobile App",
-    status: "Draft",
-    type: "Mobile",
-    completionTime: "1.5 hrs",
-    completionRate: "75%",
-    participants: 300,
-    points: "100pts",
-    createDate: "02/15/2024",
-    logo: "https://avatars.githubusercontent.com/u/68823331?v=4",
-  },
-  {
-    name: "Create a Mobile App",
-    status: "Published",
-    type: "Mobile",
-    completionTime: "1.5 hrs",
-    completionRate: "75%",
-    participants: 300,
-    points: "100pts",
-    createDate: "02/15/2024",
-    logo: "https://avatars.githubusercontent.com/u/68823331?v=4",
-  },
-  {
-    name: "Design a Logo",
-    status: "Draft",
-    type: "Design",
-    completionTime: "0.5 hrs",
-    completionRate: "95%",
-    participants: 200,
-    points: "30pts",
-    createDate: "03/10/2024",
-    logo: "https://avatars.githubusercontent.com/u/68823331?v=4",
-  },
-  {
-    name: "Design a Logo",
-    status: "Published",
-    type: "Design",
-    completionTime: "0.5 hrs",
-    completionRate: "95%",
-    participants: 200,
-    points: "30pts",
-    createDate: "03/10/2024",
-    logo: "https://avatars.githubusercontent.com/u/68823331?v=4",
-  },
-  {
-    name: "Develop a REST API",
-    status: "Published",
-    type: "Back End",
-    completionTime: "2 hrs",
-    completionRate: "80%",
-    participants: 500,
-    points: "150pts",
-    createDate: "04/05/2024",
-    logo: "https://avatars.githubusercontent.com/u/68823331?v=4",
-  },
-];
+import { useGetAllChallenges } from "../../hooks/react-query/useChallenge";
+import { TGetAllChallenge } from "./types";
+
+interface MappedChallenge {
+  id: string;
+  name: string;
+  status: string;
+  type: string;
+  completionTime: string;
+  completionRate: string;
+  participants: number;
+  points: string;
+  createDate: string;
+  logo: string;
+}
 
 const ITEMS_PER_PAGE = 10;
 
@@ -192,10 +39,29 @@ const AllChallengesTable: React.FC = () => {
   const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
 
+  const { data: challengesData, isLoading } = useGetAllChallenges("published");
+
+  const challenges: MappedChallenge[] =
+    challengesData?.content?.map((el: TGetAllChallenge) => ({
+      id: el?.id,
+      name: el?.title,
+      status: el?.state,
+      type: el?.focusArea,
+      completionTime: "N/A",
+      completionRate: "N/A",
+      participants: el?.attemptedUsers?.length || 0,
+      points: `${el?.points}pts`,
+      createDate: new Date(el?.publication?.publishedOn).toLocaleDateString(),
+      logo: el?.challengeImage?.url,
+    })) || [];
+
   // Pagination logic
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-  const currentPageData = data.slice(startIndex, startIndex + ITEMS_PER_PAGE);
-  const totalPages = Math.ceil(data.length / ITEMS_PER_PAGE);
+  const currentPageData = challenges.slice(
+    startIndex,
+    startIndex + ITEMS_PER_PAGE
+  );
+  const totalPages = Math.ceil(challenges.length / ITEMS_PER_PAGE);
 
   const handleNext = () => {
     if (currentPage < totalPages) {
@@ -210,15 +76,44 @@ const AllChallengesTable: React.FC = () => {
   };
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [selectedChallengeId, setSelectedChallengeId] = useState<string | null>(
+    null
+  );
   const open = Boolean(anchorEl);
 
-  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+  const handleClick = (event: React.MouseEvent<HTMLElement>, id: string) => {
     setAnchorEl(event.currentTarget);
+    setSelectedChallengeId(id);
   };
 
   const handleClose = () => {
     setAnchorEl(null);
+    setSelectedChallengeId(null);
   };
+
+  const handleView = () => {
+    navigate(`/challenges/view/${selectedChallengeId}`);
+    handleClose();
+  };
+
+  const handleEdit = () => {
+    navigate(`/challenges/edit/${selectedChallengeId}`);
+    handleClose();
+  };
+
+  const handleDelete = () => {
+    // Add your delete logic here
+    handleClose();
+  };
+
+  const handlePublish = () => {
+    // Add your publish logic here
+    handleClose();
+  };
+
+  if (isLoading) {
+    return <>Loadin</>;
+  }
 
   return (
     <Box
@@ -292,6 +187,7 @@ const AllChallengesTable: React.FC = () => {
               <TableCell style={{ fontWeight: "normal" }}>
                 Create Date
               </TableCell>
+              <TableCell style={{ fontWeight: "normal" }}>Actions</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -364,12 +260,12 @@ const AllChallengesTable: React.FC = () => {
                 <TableCell style={{ fontWeight: "lighter" }}>
                   {row.createDate}
                 </TableCell>
-                <>
+                <TableCell style={{ fontWeight: "lighter" }}>
                   <IconButton
                     aria-controls={open ? "challenge-menu" : undefined}
                     aria-haspopup="true"
                     aria-expanded={open ? "true" : undefined}
-                    onClick={handleClick}
+                    onClick={(event) => handleClick(event, row.id)}
                   >
                     <MoreVertIcon />
                   </IconButton>
@@ -397,7 +293,7 @@ const AllChallengesTable: React.FC = () => {
                     }}
                   >
                     <MenuItem
-                      onClick={handleClose}
+                      onClick={handlePublish}
                       sx={{
                         "&:hover": {
                           backgroundColor: "rgba(0, 0, 0, 0.04)",
@@ -407,10 +303,10 @@ const AllChallengesTable: React.FC = () => {
                         size: "small",
                       }}
                     >
-                      Published Challenge
+                      Publish Challenge
                     </MenuItem>
                     <MenuItem
-                      onClick={handleClose}
+                      onClick={handleView}
                       sx={{
                         "&:hover": {
                           backgroundColor: "rgba(0, 0, 0, 0.04)",
@@ -423,7 +319,7 @@ const AllChallengesTable: React.FC = () => {
                       View Challenge
                     </MenuItem>
                     <MenuItem
-                      onClick={handleClose}
+                      onClick={handleEdit}
                       sx={{
                         "&:hover": {
                           backgroundColor: "rgba(0, 0, 0, 0.04)",
@@ -436,7 +332,7 @@ const AllChallengesTable: React.FC = () => {
                       Edit Challenge
                     </MenuItem>
                     <MenuItem
-                      onClick={handleClose}
+                      onClick={handleDelete}
                       sx={{
                         "&:hover": {
                           backgroundColor: "rgba(0, 0, 0, 0.04)",
@@ -449,7 +345,7 @@ const AllChallengesTable: React.FC = () => {
                       Delete Challenge
                     </MenuItem>
                   </Menu>
-                </>
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
@@ -480,7 +376,7 @@ const AllChallengesTable: React.FC = () => {
           </Button>
         </div>
         <Typography variant="body2">
-          Total: {data.length} - Page {currentPage} of {totalPages}
+          Total: {challenges.length} - Page {currentPage} of {totalPages}
         </Typography>
       </div>
     </Box>

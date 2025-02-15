@@ -24,8 +24,7 @@ const NewChallengeForm: React.FC = () => {
   const [avatar, setAvatar] = React.useState<File | null>(null);
   const { isLoading, mutateAsync: createChallenge } = useCreateChallenge();
 
-  const { isLoading: avatarLoading, mutateAsync: uploadAvatar } =
-    useUploadChallengeAvatar();
+  const { mutateAsync: uploadAvatar } = useUploadChallengeAvatar();
 
   const { handleSubmit, control, setValue, trigger } = useForm<ChallengeData>({
     defaultValues: {
