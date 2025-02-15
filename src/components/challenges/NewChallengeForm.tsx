@@ -293,6 +293,11 @@ const NewChallengeForm: React.FC = () => {
           maxHeight: "70vh",
           mx: 5,
           py: 5,
+          "&::-webkit-scrollbar": {
+            display: "none",
+          },
+          "-ms-overflow-style": "none", // IE and Edge
+          "scrollbar-width": "none", // Firefox
         }}
       >
         <FormField
