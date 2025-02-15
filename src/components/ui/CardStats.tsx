@@ -1,5 +1,4 @@
 import React from "react";
-import { Box, Typography } from "@mui/material";
 
 interface CardStatsProps {
   title: string;
@@ -21,49 +20,24 @@ const CardStats: React.FC<CardStatsProps> = ({
   isLast,
 }) => {
   return (
-    <Box
-      sx={{
-        display: "flex",
-        flexDirection: "row",
-        alignItems: "flex-start",
-        justifyContent: "space-between",
-        backgroundColor: "#fff",
-        borderRight: isLast ? "none" : ".3px solid #E5E5E5",
-        gap: "1rem",
-        padding: "20px",
-        width: "25%",
-      }}
+    <div
+      className={`flex flex-row items-start justify-between bg-white ${
+        !isLast && "border-r border-gray-300"
+      } gap-4 p-5 w-1/4`}
     >
-      <Box>
-        <Typography variant="h6" sx={{ fontWeight: "bold", color: "#2C2C2C" }}>
-          {value}
-        </Typography>
-        <Typography variant="body2" sx={{ color: "#666" }}>
-          {title}
-        </Typography>
-        <Typography
-          variant="caption"
-          sx={{
-            color: isGrowthPositive ? "green" : "red",
-            fontWeight: "bold",
-            marginTop: "8px",
-            display: "block",
-          }}
+      <div>
+        <h6 className="font-bold text-[#2C2C2C] text-3xl">{value}</h6>
+        <p className="text-[#666] text-sm">{title}</p>
+        <span
+          className={`block mt-2 text-xs ${
+            isGrowthPositive ? "text-green-500" : "text-red-500"
+          }`}
         >
           {isGrowthPositive ? "▲" : "▼"} {growth} {growthPercentage}
-        </Typography>
-      </Box>
-      <Box
-        sx={{
-          backgroundColor: "#fff",
-          borderRadius: "10%",
-          padding: "15px",
-          boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)",
-        }}
-      >
-        {icon}
-      </Box>
-    </Box>
+        </span>
+      </div>
+      <div className="bg-white rounded-lg p-3 shadow-md">{icon}</div>
+    </div>
   );
 };
 

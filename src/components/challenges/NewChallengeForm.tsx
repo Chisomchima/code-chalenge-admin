@@ -229,7 +229,6 @@ const NewChallengeForm: React.FC = () => {
           <Stack direction="row" spacing={1}>
             <Button
               color="primary"
-              onClick={handleSubmit(onSubmit)}
               variant="outlined"
               sx={{ textTransform: "initial", color: "black" }}
             >
