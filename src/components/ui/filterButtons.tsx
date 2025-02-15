@@ -26,7 +26,7 @@ const FilterButtons = () => {
           const isActive = activeFilter === filter;
           // Base classes including forced normal-case
           const baseClasses =
-            "!shadow-sm hover:!shadow-md !duration-300 !ease-in !normal-case !rounded-md";
+            "!shadow-sm hover:!shadow !duration-300 !ease-in !normal-case !rounded-md";
           // Dynamic classes based on the active state
           const dynamicClasses = isActive
             ? "!bg-co-tertiary !text-white hover:!bg-co-tertiary"
@@ -45,7 +45,7 @@ const FilterButtons = () => {
         <Button
           variant="contained"
           startIcon={<DateRangeIcon />}
-          className="!bg-co-tertiary !text-white !rounded-md !normal-case hover:!bg-co-tertiary"
+          className="!bg-co-tertiary !text-white hover:!shadow !rounded-md !normal-case hover:!bg-co-tertiary"
         >
           Filter by Date
         </Button>

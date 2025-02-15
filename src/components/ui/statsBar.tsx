@@ -16,17 +16,7 @@ interface StatsBarProps {
 
 const StatsBar = ({ data }: StatsBarProps) => {
   return (
-    <Box
-      sx={{
-        display: "flex",
-        justifyContent: "space-between",
-        boxShadow: "0px 0px 4px rgba(0, 0, 0, 0.1)",
-        padding: "16px",
-        borderRadius: "8px",
-        marginTop: "1rem",
-        width: "100%",
-      }}
-    >
+    <Box className="flex justify-between shadow-sm p-2.5 py-3.5 rounded-lg mt-5 border border-gray-200 w-full">
       {data.map((stat, index) => (
         <CardStats key={index} {...stat} isLast={index === data.length - 1} />
       ))}
