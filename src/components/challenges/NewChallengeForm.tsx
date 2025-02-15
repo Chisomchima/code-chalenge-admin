@@ -33,7 +33,6 @@ const NewChallengeForm: React.FC = () => {
   const { data: challengeData, isLoading: isFetching } =
     useGetChallengeById(id);
 
-  console.log("xxxx id", id);
   const { handleSubmit, control, setValue, trigger } = useForm<ChallengeData>({
     defaultValues: {
       avatar: null,
@@ -226,7 +225,14 @@ const NewChallengeForm: React.FC = () => {
             <Controller
               name="avatar"
               control={control}
-              rules={{ required: "Avatar is required" }}
+              rules={{
+                validate: (value) => {
+                  if (!value && !avatar) {
+                    return "Avatar is required";
+                  }
+                  return true;
+                },
+              }}
               render={({ fieldState: { error } }) => (
                 <>
                   <Avatar
@@ -279,7 +285,7 @@ const NewChallengeForm: React.FC = () => {
           </Stack>
         </Card>
       </Box>
-      {isLoading && <Loader />}
+      {(isLoading || isEditing || isFetching) && <Loader />}
       <Box
         sx={{
           marginTop: 10,
