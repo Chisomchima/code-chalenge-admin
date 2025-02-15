@@ -22,9 +22,23 @@ const ChallengesTableBody: React.FC<ITableBodyProps> = ({
   open,
 }) => {
   const [selectedRowId, setSelectedRowId] = useState<string | null>(null);
+  const [publishVisible, setPublishVisible] = useState<boolean>(true);
 
   const handleRowClick = (id: string) => {
     setSelectedRowId(id);
+  };
+
+  const handleMenuClick = (
+    event: React.MouseEvent<HTMLElement>,
+    id: string,
+    status: string
+  ) => {
+    if (status === "published") {
+      setPublishVisible(false);
+    } else {
+      setPublishVisible(true);
+    }
+    handleClick(event, id);
   };
 
   return (
@@ -60,7 +74,7 @@ const ChallengesTableBody: React.FC<ITableBodyProps> = ({
               <div
                 style={{
                   fontSize: "0.8rem",
-                  color: row.status === "Draft" ? "#FFAE00" : "#A238FF",
+                  color: row.status === "preview" ? "#FFAE00" : "#A238FF",
                 }}
               >
                 {row.status}
@@ -106,7 +120,7 @@ const ChallengesTableBody: React.FC<ITableBodyProps> = ({
               aria-expanded={open ? "true" : undefined}
               onClick={(event) => {
                 event.stopPropagation();
-                handleClick(event, row.id);
+                handleMenuClick(event, row.id, row.status);
               }}
             >
               <MoreVertIcon />
@@ -134,19 +148,21 @@ const ChallengesTableBody: React.FC<ITableBodyProps> = ({
                 size: "small",
               }}
             >
-              <MenuItem
-                onClick={handlePublish}
-                sx={{
-                  "&:hover": {
-                    backgroundColor: "rgba(0, 0, 0, 0.04)",
-                    transition: "background-color 0.2s ease",
-                  },
-                  fontWeight: "lighter",
-                  size: "small",
-                }}
-              >
-                Publish Challenge
-              </MenuItem>
+              {publishVisible && (
+                <MenuItem
+                  onClick={handlePublish}
+                  sx={{
+                    "&:hover": {
+                      backgroundColor: "rgba(0, 0, 0, 0.04)",
+                      transition: "background-color 0.2s ease",
+                    },
+                    fontWeight: "lighter",
+                    size: "small",
+                  }}
+                >
+                  Publish Challenge
+                </MenuItem>
+              )}
               <MenuItem
                 onClick={handleView}
                 sx={{

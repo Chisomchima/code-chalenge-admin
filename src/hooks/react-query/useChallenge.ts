@@ -5,6 +5,7 @@ import {
   EditChallenge,
   GetAllChallenges,
   GetChallengeById,
+  PublishChallenge,
   uploadChallengeAvatar,
 } from "../../services/challengeService";
 import { ChallengeData } from "../../components/challenges/types";
@@ -31,6 +32,10 @@ export const useEditChallenge = () => {
   return useMutation((params: { challengeId: string; data: ChallengeData }) =>
     EditChallenge(params.challengeId, params.data)
   );
+};
+
+export const usePublishChallenge = () => {
+  return useMutation((challengeId: string) => PublishChallenge(challengeId));
 };
 
 export const useUploadChallengeAvatar = () => {

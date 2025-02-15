@@ -47,6 +47,20 @@ export const verifyOTP = async (data: { email: string; otp: string }) => {
   }
 };
 
+export const getBadge = async (userId: string, badgeId: string) => {
+  try {
+    const response = await axiosInstance.get(
+      `/api/users/send-badge/${userId}/${badgeId}`
+    );
+    console.log(response.data, "Badge data");
+
+    return response.data;
+  } catch (error) {
+    handleError(error as AxiosError, "Failed to fetch Badge data.");
+    throw error;
+  }
+};
+
 export const editUser = async (data: {
   id: string;
   [key: string]: unknown;
