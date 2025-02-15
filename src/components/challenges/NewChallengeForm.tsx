@@ -14,6 +14,7 @@ import { Delete, Add } from "@mui/icons-material";
 import { ChallengeData } from "./types";
 import {
   useCreateChallenge,
+  useEditChallenge,
   useGetChallengeById,
   useUploadChallengeAvatar,
 } from "../../hooks/react-query/useChallenge";
@@ -26,7 +27,8 @@ const NewChallengeForm: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const [avatar, setAvatar] = React.useState<File | null>(null);
   const { isLoading, mutateAsync: createChallenge } = useCreateChallenge();
-
+  const { isLoading: isEditing, mutateAsync: editChallenge } =
+    useEditChallenge();
   const { mutateAsync: uploadAvatar } = useUploadChallengeAvatar();
   const { data: challengeData, isLoading: isFetching } =
     useGetChallengeById(id);
@@ -97,12 +99,11 @@ const NewChallengeForm: React.FC = () => {
 
     if (id) {
       // Handle challenge update
-      // const editResponse = await editChallenge({
-      //   challengeId: id,
-      //   data: challengeDetails,
-      // });
-      // if (!editResponse?.success)
-      return;
+      const editResponse = await editChallenge({
+        challengeId: id,
+        data: challengeDetails,
+      });
+      if (!editResponse?.success) return;
     } else {
       // Handle new challenge creation
       const challengeResponse = await createChallenge(challengeDetails);
