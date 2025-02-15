@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Card,
   Avatar,
@@ -14,17 +14,24 @@ import { Delete, Add } from "@mui/icons-material";
 import { ChallengeData } from "./types";
 import {
   useCreateChallenge,
+  useEditChallenge,
+  useGetChallengeById,
   useUploadChallengeAvatar,
 } from "../../hooks/react-query/useChallenge";
 import Loader from "../ui/Loader";
+import { useParams } from "react-router-dom";
 import FormField from "./FormField";
 import { focusAreas, skillLevels } from "../../utils/constant";
 
 const NewChallengeForm: React.FC = () => {
+  const { id } = useParams<{ id: string }>();
   const [avatar, setAvatar] = React.useState<File | null>(null);
   const { isLoading, mutateAsync: createChallenge } = useCreateChallenge();
-
+  const { isLoading: isEditing, mutateAsync: editChallenge } =
+    useEditChallenge();
   const { mutateAsync: uploadAvatar } = useUploadChallengeAvatar();
+  const { data: challengeData, isLoading: isFetching } =
+    useGetChallengeById(id);
 
   const { handleSubmit, control, setValue, trigger } = useForm<ChallengeData>({
     defaultValues: {
@@ -41,6 +48,22 @@ const NewChallengeForm: React.FC = () => {
       attachments: [{ title: "", description: "" }],
     },
   });
+
+  useEffect(() => {
+    if (challengeData?.content) {
+      setAvatar(challengeData.content.challengeImage?.url);
+      setValue("title", challengeData.content.title);
+      setValue("focusArea", challengeData.content.focusArea);
+      setValue("prerequisites", challengeData.content.prerequisites);
+      setValue("points", challengeData.content.points);
+      setValue("skillLevel", challengeData.content.skillLevel);
+      setValue("description", challengeData.content.description);
+      setValue("acceptanceCriteria", challengeData.content.acceptanceCriteria);
+      setValue("rulesAndResources", challengeData.content.rulesAndResources);
+      setValue("onlineResources", challengeData.content.onlineResources);
+      setValue("attachments", challengeData.content.attachments);
+    }
+  }, [challengeData, setValue]);
 
   // Field arrays for dynamic fields
   const {
@@ -67,13 +90,30 @@ const NewChallengeForm: React.FC = () => {
     remove: removeAttachments,
   } = useFieldArray({ control, name: "attachments" });
 
-  const onSubmit = async (data: ChallengeData) => {
+  const onSubmit = async (data: ChallengeData): Promise<void> => {
     const formData = new FormData();
-    const { avatar, ...others } = data;
-    const challengeResponse = await createChallenge(others);
+    const { avatar, ...challengeDetails } = data;
 
-    if (avatar && challengeResponse?.success) {
-      formData.append("id", challengeResponse?.content?.challengeID);
+    let challengeId = id;
+
+    if (id) {
+      // Handle challenge update
+      const editResponse = await editChallenge({
+        challengeId: id,
+        data: challengeDetails,
+      });
+      if (!editResponse?.success) return;
+    } else {
+      // Handle new challenge creation
+      const challengeResponse = await createChallenge(challengeDetails);
+      if (!challengeResponse?.success) return;
+
+      challengeId = challengeResponse.content?.challengeID;
+    }
+
+    // Upload avatar if available (for both edit and create)
+    if (avatar && challengeId) {
+      formData.append("id", challengeId);
       formData.append("image", avatar);
       await uploadAvatar(formData);
     }
@@ -185,15 +225,22 @@ const NewChallengeForm: React.FC = () => {
             <Controller
               name="avatar"
               control={control}
-              rules={{ required: "Avatar is required" }}
+              rules={{
+                validate: (value) => {
+                  if (!value && !avatar) {
+                    return "Avatar is required";
+                  }
+                  return true;
+                },
+              }}
               render={({ fieldState: { error } }) => (
                 <>
                   <Avatar
                     variant="rounded"
                     src={
-                      avatar
+                      avatar instanceof File
                         ? URL.createObjectURL(avatar)
-                        : "https://via.placeholder.com/50"
+                        : avatar || "https://via.placeholder.com/50"
                     }
                     sx={{ width: 60, height: 60, cursor: "pointer" }}
                     onClick={() =>
@@ -229,15 +276,16 @@ const NewChallengeForm: React.FC = () => {
           <Stack direction="row" spacing={1}>
             <Button
               color="primary"
-              variant="outlined"
-              sx={{ textTransform: "initial", color: "black" }}
+              onClick={handleSubmit(onSubmit)}
+              variant={id ? "contained" : "outlined"}
+              sx={{ textTransform: "initial", color: id ? "white" : "black" }}
             >
-              Draft for Later
+              {id ? "Edit" : "Draft for later"}
             </Button>
           </Stack>
         </Card>
       </Box>
-      {isLoading && <Loader />}
+      {(isLoading || isEditing || isFetching) && <Loader />}
       <Box
         sx={{
           marginTop: 10,
