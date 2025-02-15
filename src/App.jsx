@@ -18,6 +18,7 @@ const routes = [
   { path: "/", component: Home, protected: true },
   { path: "/challenges", component: Challenges, protected: true },
   { path: "/challenges/new", component: CreateChallenge, protected: true },
+  { path: "/challenges/edit/:id", component: CreateChallenge, protected: true },
 ];
 
 function App() {
