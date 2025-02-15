@@ -71,3 +71,16 @@ export interface ITableBodyProps {
   anchorEl: HTMLElement | null;
   open: boolean;
 }
+
+export interface IPaginationControlsProps {
+  currentPage: number;
+  totalPages: number;
+  handlePrevious: () => void;
+  handleNext: () => void;
+  totalChallenges: number;
+}
+
+export interface ISearchBarProps {
+  searchQuery: string;
+  setSearchQuery: (query: string) => void;
+}

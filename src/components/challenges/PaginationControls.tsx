@@ -1,15 +1,8 @@
 import React from "react";
 import { Box, Button, Typography } from "@mui/material";
+import { IPaginationControlsProps } from "./types";
 
-interface PaginationControlsProps {
-  currentPage: number;
-  totalPages: number;
-  handlePrevious: () => void;
-  handleNext: () => void;
-  totalChallenges: number;
-}
-
-const PaginationControls: React.FC<PaginationControlsProps> = ({
+const PaginationControls: React.FC<IPaginationControlsProps> = ({
   currentPage,
   totalPages,
   handlePrevious,

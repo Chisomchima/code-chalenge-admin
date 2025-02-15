@@ -1,13 +1,9 @@
 import React from "react";
 import { Box, InputBase } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
+import { ISearchBarProps } from "./types";
 
-interface SearchBarProps {
-  searchQuery: string;
-  setSearchQuery: (query: string) => void;
-}
-
-const SearchBar: React.FC<SearchBarProps> = ({
+const SearchBar: React.FC<ISearchBarProps> = ({
   searchQuery,
   setSearchQuery,
 }) => {

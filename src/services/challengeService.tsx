@@ -31,6 +31,20 @@ export const GetAllChallenges = async (param: string) => {
   }
 };
 
+export const DeleteChallenge = async (challengeId: string) => {
+  try {
+    const response = await axiosInstance.delete(
+      `/api/challenges/delete-challenge/${challengeId}`
+    );
+    toast.success("Challenge deleted successfully!");
+    return response.data;
+  } catch (error) {
+    handleError(error as AxiosError, "An unexpected error occurred.");
+    toast.error("Failed to delete challenge.");
+    throw error;
+  }
+};
+
 export const uploadChallengeAvatar = async (data: any) => {
   try {
     const response = await axiosInstance.post(

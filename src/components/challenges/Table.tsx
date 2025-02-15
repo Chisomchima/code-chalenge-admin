@@ -1,12 +1,16 @@
 import React, { useState } from "react";
 import { Table, TableContainer, Typography, Button, Box } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { useGetAllChallenges } from "../../hooks/react-query/useChallenge";
+import {
+  useDeleteChallenge,
+  useGetAllChallenges,
+} from "../../hooks/react-query/useChallenge";
 import { IMappedChallenge, TGetAllChallenge } from "./types";
 import SearchBar from "./SearchBar";
 import TableHeader from "./TableHeader";
 import ChallengesTableBody from "./ChallengesTableBody";
 import PaginationControls from "./PaginationControls";
+import Loader from "../ui/Loader";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -15,7 +19,13 @@ const AllChallengesTable: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
 
-  const { data: challengesData, isLoading } = useGetAllChallenges("all");
+  const {
+    data: challengesData,
+    isLoading,
+    refetch,
+  } = useGetAllChallenges("all");
+  const { mutate: deleteChallenge, isLoading: loadingDel } =
+    useDeleteChallenge();
 
   const challenges: IMappedChallenge[] =
     challengesData?.content?.map((el: TGetAllChallenge) => ({
@@ -92,8 +102,14 @@ const AllChallengesTable: React.FC = () => {
   };
 
   const handleDelete = () => {
-    // Add your delete logic here
-    handleClose();
+    if (selectedChallengeId) {
+      deleteChallenge(selectedChallengeId, {
+        onSuccess: () => {
+          handleClose();
+          refetch();
+        },
+      });
+    }
   };
 
   const handlePublish = () => {
@@ -159,6 +175,7 @@ const AllChallengesTable: React.FC = () => {
             open={open}
           />
         </Table>
+        {loadingDel && <Loader />}
       </TableContainer>
       <PaginationControls
         currentPage={currentPage}

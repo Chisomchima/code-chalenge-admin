@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   TableBody,
   TableRow,
@@ -21,19 +21,28 @@ const ChallengesTableBody: React.FC<ITableBodyProps> = ({
   anchorEl,
   open,
 }) => {
+  const [selectedRowId, setSelectedRowId] = useState<string | null>(null);
+
+  const handleRowClick = (id: string) => {
+    setSelectedRowId(id);
+  };
+
   return (
     <TableBody>
       {currentPageData.map((row) => (
         <TableRow
-          key={row?.id}
+          key={row.id}
           sx={{
             "& td, & th": { border: 0 },
+            backgroundColor:
+              selectedRowId === row.id ? "rgba(0, 0, 0, 0.08)" : "inherit",
             "&:hover": {
               backgroundColor: "rgba(0, 0, 0, 0.04)",
               transition: "background-color 0.2s ease",
             },
             cursor: "pointer",
           }}
+          onClick={() => handleRowClick(row.id)}
         >
           <TableCell style={{ fontWeight: "lighter", display: "flex" }}>
             <img
@@ -95,7 +104,10 @@ const ChallengesTableBody: React.FC<ITableBodyProps> = ({
               aria-controls={open ? "challenge-menu" : undefined}
               aria-haspopup="true"
               aria-expanded={open ? "true" : undefined}
-              onClick={(event) => handleClick(event, row.id)}
+              onClick={(event) => {
+                event.stopPropagation();
+                handleClick(event, row.id);
+              }}
             >
               <MoreVertIcon />
             </IconButton>
