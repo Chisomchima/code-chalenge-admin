@@ -46,3 +46,28 @@ export type TGetAllChallenge = {
   attachments: any[];
   id: string;
 };
+
+export interface IMappedChallenge {
+  id: string;
+  name: string;
+  status: string;
+  type: string;
+  completionTime: string;
+  completionRate: string;
+  participants: number;
+  points: string;
+  createDate: string;
+  logo: string;
+}
+
+export interface ITableBodyProps {
+  currentPageData: IMappedChallenge[];
+  handleClick: (event: React.MouseEvent<HTMLElement>, id: string) => void;
+  handleClose: () => void;
+  handleView: () => void;
+  handleEdit: () => void;
+  handleDelete: () => void;
+  handlePublish: () => void;
+  anchorEl: HTMLElement | null;
+  open: boolean;
+}
