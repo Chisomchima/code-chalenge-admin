@@ -33,11 +33,13 @@ const ChallengesTableBody: React.FC<ITableBodyProps> = ({
     id: string,
     status: string
   ) => {
+    event.stopPropagation();
     if (status === "published") {
       setPublishVisible(false);
     } else {
       setPublishVisible(true);
     }
+    setSelectedRowId(id);
     handleClick(event, id);
   };
 
@@ -46,13 +48,11 @@ const ChallengesTableBody: React.FC<ITableBodyProps> = ({
       {currentPageData.map((row) => (
         <TableRow
           key={row.id}
+          selected={selectedRowId === row.id}
           sx={{
             "& td, & th": { border: 0 },
-            backgroundColor:
-              selectedRowId === row.id ? "rgba(0, 0, 0, 0.08)" : "inherit",
             "&:hover": {
               backgroundColor: "rgba(0, 0, 0, 0.04)",
-              transition: "background-color 0.2s ease",
             },
             cursor: "pointer",
           }}
@@ -118,10 +118,7 @@ const ChallengesTableBody: React.FC<ITableBodyProps> = ({
               aria-controls={open ? "challenge-menu" : undefined}
               aria-haspopup="true"
               aria-expanded={open ? "true" : undefined}
-              onClick={(event) => {
-                event.stopPropagation();
-                handleMenuClick(event, row.id, row.status);
-              }}
+              onClick={(event) => handleMenuClick(event, row.id, row.status)}
             >
               <MoreVertIcon />
             </IconButton>
