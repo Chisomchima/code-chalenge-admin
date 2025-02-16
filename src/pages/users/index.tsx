@@ -76,7 +76,7 @@ const UsersPage = () => {
                   <DropdownMenuContent className="w-fit !font-inter">
                     <DropdownMenuItem>View</DropdownMenuItem>
                     <DropdownMenuItem>Suspend</DropdownMenuItem>
-                    <DropdownMenuItem>Delee</DropdownMenuItem>
+                    <DropdownMenuItem>Delete</DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </TableCell>

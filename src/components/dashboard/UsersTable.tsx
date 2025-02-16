@@ -12,15 +12,7 @@ import {
 } from "@mui/material";
 import { Input } from "../ui/input";
 import { Search } from "lucide-react";
-
-interface TableCompProps {
-  tableHeaderTitle: ReactNode;
-  tableHead: string[];
-  tableBody: ReactNode;
-  tableData: unknown[];
-  hasSearch?: boolean;
-  searchPlaceholder?: string;
-}
+import { TableCompProps } from "@/utils/types";
 
 const UsersTable = ({
   tableHeaderTitle,
