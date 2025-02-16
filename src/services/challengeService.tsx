@@ -75,6 +75,20 @@ export const EditChallenge = async (
   }
 };
 
+export const PublishChallenge = async (challengeId: string) => {
+  try {
+    const response = await axiosInstance.post(
+      `/api/admin/publish-challenge/${challengeId}`
+    );
+    toast.success("Challenge published successfully!");
+    return response.data;
+  } catch (error) {
+    handleError(error as AxiosError, "An unexpected error occurred.");
+    toast.error("Failed to publish challenge.");
+    throw error;
+  }
+};
+
 export const uploadChallengeAvatar = async (data: any) => {
   try {
     const response = await axiosInstance.post(

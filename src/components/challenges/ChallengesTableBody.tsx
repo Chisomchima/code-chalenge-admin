@@ -22,9 +22,25 @@ const ChallengesTableBody: React.FC<ITableBodyProps> = ({
   open,
 }) => {
   const [selectedRowId, setSelectedRowId] = useState<string | null>(null);
+  const [publishVisible, setPublishVisible] = useState<boolean>(true);
 
   const handleRowClick = (id: string) => {
     setSelectedRowId(id);
+  };
+
+  const handleMenuClick = (
+    event: React.MouseEvent<HTMLElement>,
+    id: string,
+    status: string
+  ) => {
+    event.stopPropagation();
+    if (status === "published") {
+      setPublishVisible(false);
+    } else {
+      setPublishVisible(true);
+    }
+    setSelectedRowId(id);
+    handleClick(event, id);
   };
 
   return (
@@ -32,13 +48,11 @@ const ChallengesTableBody: React.FC<ITableBodyProps> = ({
       {currentPageData.map((row) => (
         <TableRow
           key={row.id}
+          selected={selectedRowId === row.id}
           sx={{
             "& td, & th": { border: 0 },
-            backgroundColor:
-              selectedRowId === row.id ? "rgba(0, 0, 0, 0.08)" : "inherit",
             "&:hover": {
               backgroundColor: "rgba(0, 0, 0, 0.04)",
-              transition: "background-color 0.2s ease",
             },
             cursor: "pointer",
           }}
@@ -60,7 +74,7 @@ const ChallengesTableBody: React.FC<ITableBodyProps> = ({
               <div
                 style={{
                   fontSize: "0.8rem",
-                  color: row.status === "Draft" ? "#FFAE00" : "#A238FF",
+                  color: row.status === "preview" ? "#FFAE00" : "#A238FF",
                 }}
               >
                 {row.status}
@@ -104,10 +118,7 @@ const ChallengesTableBody: React.FC<ITableBodyProps> = ({
               aria-controls={open ? "challenge-menu" : undefined}
               aria-haspopup="true"
               aria-expanded={open ? "true" : undefined}
-              onClick={(event) => {
-                event.stopPropagation();
-                handleClick(event, row.id);
-              }}
+              onClick={(event) => handleMenuClick(event, row.id, row.status)}
             >
               <MoreVertIcon />
             </IconButton>
@@ -134,19 +145,21 @@ const ChallengesTableBody: React.FC<ITableBodyProps> = ({
                 size: "small",
               }}
             >
-              <MenuItem
-                onClick={handlePublish}
-                sx={{
-                  "&:hover": {
-                    backgroundColor: "rgba(0, 0, 0, 0.04)",
-                    transition: "background-color 0.2s ease",
-                  },
-                  fontWeight: "lighter",
-                  size: "small",
-                }}
-              >
-                Publish Challenge
-              </MenuItem>
+              {publishVisible && (
+                <MenuItem
+                  onClick={handlePublish}
+                  sx={{
+                    "&:hover": {
+                      backgroundColor: "rgba(0, 0, 0, 0.04)",
+                      transition: "background-color 0.2s ease",
+                    },
+                    fontWeight: "lighter",
+                    size: "small",
+                  }}
+                >
+                  Publish Challenge
+                </MenuItem>
+              )}
               <MenuItem
                 onClick={handleView}
                 sx={{

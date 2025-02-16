@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import {
   useDeleteChallenge,
   useGetAllChallenges,
+  usePublishChallenge,
 } from "../../hooks/react-query/useChallenge";
 import { IMappedChallenge, TGetAllChallenge } from "./types";
 import SearchBar from "./SearchBar";
@@ -26,6 +27,8 @@ const AllChallengesTable: React.FC = () => {
   } = useGetAllChallenges("all");
   const { mutate: deleteChallenge, isLoading: loadingDel } =
     useDeleteChallenge();
+  const { mutate: publishChallenge, isLoading: loadingPub } =
+    usePublishChallenge();
 
   const challenges: IMappedChallenge[] =
     challengesData?.content?.map((el: TGetAllChallenge) => ({
@@ -105,16 +108,22 @@ const AllChallengesTable: React.FC = () => {
     if (selectedChallengeId) {
       deleteChallenge(selectedChallengeId, {
         onSuccess: () => {
-          handleClose();
           refetch();
         },
       });
+      handleClose();
     }
   };
 
   const handlePublish = () => {
-    // Add your publish logic here
-    handleClose();
+    if (selectedChallengeId) {
+      publishChallenge(selectedChallengeId, {
+        onSuccess: () => {
+          refetch();
+        },
+      });
+      handleClose();
+    }
   };
 
   if (isLoading) {
@@ -175,7 +184,7 @@ const AllChallengesTable: React.FC = () => {
             open={open}
           />
         </Table>
-        {loadingDel && <Loader />}
+        {(loadingDel || loadingPub) && <Loader />}
       </TableContainer>
       <PaginationControls
         currentPage={currentPage}
