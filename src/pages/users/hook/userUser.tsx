@@ -1,13 +1,5 @@
-import { axiosInstance } from "@/utils/axiosInstance";
 import { useQuery } from "react-query";
-import { User } from "../constant";
-
-interface ApiResponse {
-  content: User[];
-  total: number;
-  page: number;
-  limit: number;
-}
+import { getAllUsersFunc } from "../../../services/_user.service";
 
 export const useUser = () => {
   const tableHeadData: string[] = [
@@ -20,20 +12,12 @@ export const useUser = () => {
     "Signup Date",
   ];
 
-  const fetchUsers = async () => {
-    const response = await axiosInstance.get("/api/admin/users?page=1&limit=1");
-
-    return response.data;
+  const getAllUsers = (page: number, limit: number) => {
+    return useQuery("getAllUsers", () => getAllUsersFunc(page, limit));
   };
 
-  const { data, isLoading } = useQuery<ApiResponse>({
-    queryKey: ["users"],
-    queryFn: fetchUsers,
-  });
-
   return {
+    getAllUsers,
     tableHeadData,
-    data: data?.content,
-    isLoading,
   };
 };

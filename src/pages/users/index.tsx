@@ -14,6 +14,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import "react-lazy-load-image-component/src/effects/blur.css";
+import { useState } from "react";
 
 const EmptyState = ({ message }: { message: string }) => (
   <Box className="flex flex-col items-center justify-center p-8 h-[40vh]">
@@ -69,11 +70,16 @@ const UserDropdownMenu = () => (
 // ! IMPORTANT: missing properties being returned from BE (placeholders used for now)
 // ! Some properties are used in the wrong table col because the properties are missing from data
 const UsersPage = () => {
-  const { tableHeadData, data, isLoading } = useUser();
-  const isEmpty = !data?.length;
+  const { tableHeadData, getAllUsers } = useUser();
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(1);
+
+  const { data, isLoading } = getAllUsers(page, limit);
+
+  const isEmpty = !data?.content.length;
 
   // Sort users alphabetically by firstName and lastName
-  const sortedData = data?.slice().sort((a, b) => {
+  const sortedData = data?.content.slice().sort((a, b) => {
     const nameA = `${a.firstName} ${a.lastName}`.toLowerCase();
     const nameB = `${b.firstName} ${b.lastName}`.toLowerCase();
     return nameA.localeCompare(nameB);
