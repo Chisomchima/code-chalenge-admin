@@ -66,12 +66,18 @@ const UserDropdownMenu = () => (
   </DropdownMenu>
 );
 
+// ! IMPORTANT: missing properties being returned from BE (placeholders used for now)
+// ! Some properties are used in the wrong table col because the properties are missing from data
 const UsersPage = () => {
   const { tableHeadData, data, isLoading } = useUser();
   const isEmpty = !data?.length;
 
-  // ! IMPORTANT: missing properties being returned from BE (placeholders used for now)
-  // ! Some properties are used in the wrong table col because the properties are missing from data
+  // Sort users alphabetically by firstName and lastName
+  const sortedData = data?.slice().sort((a, b) => {
+    const nameA = `${a.firstName} ${a.lastName}`.toLowerCase();
+    const nameB = `${b.firstName} ${b.lastName}`.toLowerCase();
+    return nameA.localeCompare(nameB);
+  });
 
   return (
     <Box className="py-4 pr-4">
@@ -87,7 +93,7 @@ const UsersPage = () => {
             tableHead={tableHeadData}
             hasSearch
             searchPlaceholder="Search"
-            tableBody={data?.map((row, index) => (
+            tableBody={sortedData?.map((row, index) => (
               <TableRow
                 key={index}
                 className="cursor-pointer hover:bg-black/5 transition-colors duration-200"
