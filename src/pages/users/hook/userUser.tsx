@@ -1,3 +1,6 @@
+import { useQuery } from "react-query";
+import { getAllUsersFunc } from "../../../services/_user.service";
+
 export const useUser = () => {
   const tableHeadData: string[] = [
     "Name/Email",
@@ -9,5 +12,12 @@ export const useUser = () => {
     "Signup Date",
   ];
 
-  return [tableHeadData] as const;
+  const getAllUsers = (page: number, limit: number) => {
+    return useQuery("getAllUsers", () => getAllUsersFunc(page, limit));
+  };
+
+  return {
+    getAllUsers,
+    tableHeadData,
+  };
 };

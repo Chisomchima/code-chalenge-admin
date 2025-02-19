@@ -1,3 +1,4 @@
+import { User } from "@/pages/users/constant";
 import { ReactNode } from "react";
 
 export interface TableCompProps {
@@ -7,4 +8,11 @@ export interface TableCompProps {
   tableData: unknown[];
   hasSearch?: boolean;
   searchPlaceholder?: string;
+}
+
+export interface ApiResponse {
+  content: User[];
+  total: number;
+  page: number;
+  limit: number;
 }
