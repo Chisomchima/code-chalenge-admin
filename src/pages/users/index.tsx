@@ -1,4 +1,4 @@
-import { Box, TableCell, TableRow, Typography } from "@mui/material";
+import { Box, TableCell, TableRow } from "@mui/material";
 import FilterButtons from "@/components/ui/filterButtons";
 import StatsBar from "@/components/ui/statsBar";
 import { STATS_BAR_DATA, usersMockData } from "./mock_data/_schema";
@@ -15,25 +15,7 @@ import { Button } from "@/components/ui/button";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import "react-lazy-load-image-component/src/effects/blur.css";
 import { useState } from "react";
-
-const EmptyState = ({ message }: { message: string }) => (
-  <Box className="flex flex-col items-center justify-center p-8 h-[40vh]">
-    <Typography
-      variant="h6"
-      className="text-gray-500 !font-inter !text-2xl !font-semibold"
-    >
-      {message}
-    </Typography>
-    <Typography
-      variant="body2"
-      className="text-gray-400 mt-2 text-sm !font-inter"
-    >
-      {message === "No users found"
-        ? "There are no users to display at the moment."
-        : "Getting users data"}
-    </Typography>
-  </Box>
-);
+import EmptyState from "@/components/ui/EmptyState";
 
 const UserAvatar = ({ avatar, name }: { avatar?: string; name: string }) => (
   <div className="h-10 w-10 overflow-hidden rounded-sm bg-gray-300 flex items-center justify-center">
