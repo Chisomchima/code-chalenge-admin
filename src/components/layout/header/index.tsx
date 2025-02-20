@@ -10,7 +10,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import { IoNotificationsCircleOutline } from "react-icons/io5";
 import { useLocation } from "react-router-dom";
 import Cookies from "js-cookie";
-import { Navigation } from "../../../utils/enums";
+import { Navigation } from "@/utils/enums";
 
 const Header: React.FC<{
   small: boolean;
