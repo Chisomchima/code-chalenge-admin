@@ -12,6 +12,7 @@ import TableHeader from "./TableHeader";
 import ChallengesTableBody from "./ChallengesTableBody";
 import PaginationControls from "./PaginationControls";
 import Loader from "../ui/Loader";
+import EmptyState from "../ui/EmptyState";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -25,10 +26,13 @@ const AllChallengesTable: React.FC = () => {
     isLoading,
     refetch,
   } = useGetAllChallenges("all");
+
   const { mutate: deleteChallenge, isLoading: loadingDel } =
     useDeleteChallenge();
   const { mutate: publishChallenge, isLoading: loadingPub } =
     usePublishChallenge();
+
+  const isEmpty = !challengesData?.content.length;
 
   const challenges: IMappedChallenge[] =
     challengesData?.content?.map((el: TGetAllChallenge) => ({
@@ -126,73 +130,81 @@ const AllChallengesTable: React.FC = () => {
     }
   };
 
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
-
   return (
-    <Box
-      sx={{
-        borderRadius: "10px",
-        padding: "1rem",
-        border: "1px solid #E5E5E5",
-      }}
-    >
-      <Box
-        sx={{ display: "flex", justifyContent: "space-between", width: "100%" }}
-      >
-        <Typography
-          variant="h6"
-          style={{ marginBottom: "1rem", width: "100%" }}
+    <Box className="my-4">
+      {isEmpty ? (
+        <EmptyState message="No challenge found" />
+      ) : isLoading ? (
+        <EmptyState message="Getting challenge data" />
+      ) : (
+        <Box
+          sx={{
+            borderRadius: "10px",
+            padding: "1rem",
+            border: "1px solid #E5E5E5",
+          }}
         >
-          Challenges
-        </Typography>
-        <Box sx={{ display: "flex", gap: "1rem" }}>
-          <Button
-            variant="contained"
-            size="small"
+          <Box
             sx={{
-              backgroundColor: "#A238FF",
-              width: "13rem",
-              "&:hover": {
-                backgroundColor: "#8A1FCC",
-              },
+              display: "flex",
+              justifyContent: "space-between",
+              width: "100%",
             }}
-            onClick={() => navigate("/challenges/new")}
           >
-            Create Challenge
-          </Button>
-          <SearchBar
-            searchQuery={searchQuery}
-            setSearchQuery={setSearchQuery}
+            <Typography
+              variant="h6"
+              style={{ marginBottom: "1rem", width: "100%" }}
+            >
+              Challenges
+            </Typography>
+            <Box sx={{ display: "flex", gap: "1rem" }}>
+              <Button
+                variant="contained"
+                size="small"
+                sx={{
+                  backgroundColor: "#A238FF",
+                  width: "13rem",
+                  "&:hover": {
+                    backgroundColor: "#8A1FCC",
+                  },
+                }}
+                onClick={() => navigate("/challenges/new")}
+              >
+                Create Challenge
+              </Button>
+              <SearchBar
+                searchQuery={searchQuery}
+                setSearchQuery={setSearchQuery}
+              />
+            </Box>
+          </Box>
+
+          <TableContainer>
+            <Table>
+              <TableHeader />
+              <ChallengesTableBody
+                currentPageData={currentPageData}
+                handleClick={handleClick}
+                handleClose={handleClose}
+                handleView={handleView}
+                handleEdit={handleEdit}
+                handleDelete={handleDelete}
+                handlePublish={handlePublish}
+                anchorEl={anchorEl}
+                open={open}
+              />
+            </Table>
+            {(loadingDel || loadingPub) && <Loader />}
+          </TableContainer>
+          <PaginationControls
+            currentPage={currentPage}
+            totalPages={totalPages}
+            handlePrevious={handlePrevious}
+            handleNext={handleNext}
+            totalChallenges={filteredChallenges.length}
           />
         </Box>
-      </Box>
-
-      <TableContainer>
-        <Table>
-          <TableHeader />
-          <ChallengesTableBody
-            currentPageData={currentPageData}
-            handleClick={handleClick}
-            handleClose={handleClose}
-            handleView={handleView}
-            handleEdit={handleEdit}
-            handleDelete={handleDelete}
-            handlePublish={handlePublish}
-            anchorEl={anchorEl}
-            open={open}
-          />
-        </Table>
-        {(loadingDel || loadingPub) && <Loader />}
-      </TableContainer>
-      <PaginationControls
-        currentPage={currentPage}
-        totalPages={totalPages}
-        handlePrevious={handlePrevious}
-        handleNext={handleNext}
-        totalChallenges={filteredChallenges.length}
-      />
+      )}
     </Box>
   );
 };
