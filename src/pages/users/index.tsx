@@ -15,6 +15,17 @@ import { Button } from "@/components/ui/button";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import "react-lazy-load-image-component/src/effects/blur.css";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+
+// Utility function to format the date
+const formatDate = (dateString: string | number) => {
+  const date = new Date(dateString);
+  return date.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
+};
 
 const EmptyState = ({ message }: { message: string }) => (
   <Box className="flex flex-col items-center justify-center p-8 h-[40vh]">
@@ -52,23 +63,31 @@ const UserAvatar = ({ avatar, name }: { avatar?: string; name: string }) => (
   </div>
 );
 
-const UserDropdownMenu = () => (
-  <DropdownMenu>
-    <DropdownMenuTrigger asChild>
-      <Button className="w-5 px-1 py-2 rounded-sm bg-transparent outline-none border-0 !ring-0 shadow-none hover:bg-gray-100 text-gray-500 h-5">
-        <EllipsisVertical strokeWidth={1.5} />
-      </Button>
-    </DropdownMenuTrigger>
-    <DropdownMenuContent className="w-fit !font-inter">
-      <DropdownMenuItem>View</DropdownMenuItem>
-      <DropdownMenuItem>Suspend</DropdownMenuItem>
-      <DropdownMenuItem>Delete</DropdownMenuItem>
-    </DropdownMenuContent>
-  </DropdownMenu>
-);
+const UserDropdownMenu = ({ id }: { id: string }) => {
+  const navigate = useNavigate();
 
-// ! IMPORTANT: missing properties being returned from BE (placeholders used for now)
-// ! Some properties are used in the wrong table col because the properties are missing from data
+  const redirectToUserDetailsPage = (id: string) => {
+    navigate(`/user/${id}`);
+  };
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button className="w-5 px-1 py-2 rounded-sm bg-transparent outline-none border-0 !ring-0 shadow-none hover:bg-gray-100 text-gray-500 h-5">
+          <EllipsisVertical strokeWidth={1.5} />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="w-fit !font-inter">
+        <DropdownMenuItem onClick={() => redirectToUserDetailsPage(id)}>
+          View
+        </DropdownMenuItem>
+        <DropdownMenuItem>Suspend</DropdownMenuItem>
+        <DropdownMenuItem>Delete</DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+};
+
 const UsersPage = () => {
   const { tableHeadData, getAllUsers } = useUser();
   const [page, setPage] = useState(1);
@@ -84,6 +103,12 @@ const UsersPage = () => {
     const nameB = `${b.firstName} ${b.lastName}`.toLowerCase();
     return nameA.localeCompare(nameB);
   });
+
+  const navigate = useNavigate();
+
+  const redirectToUserDetailsPage = (id: string) => {
+    navigate(`/user/${id}`);
+  };
 
   return (
     <Box className="py-4 pr-4">
@@ -102,6 +127,7 @@ const UsersPage = () => {
             tableBody={sortedData?.map((row, index) => (
               <TableRow
                 key={index}
+                onClick={() => redirectToUserDetailsPage(row.id)}
                 className="cursor-pointer hover:bg-black/5 transition-colors duration-200"
               >
                 <TableCell className="!font-light !font-inter w-fit">
@@ -130,26 +156,29 @@ const UsersPage = () => {
                 <TableCell className="!font-inter">
                   <div className="flex items-center gap-1">
                     <Medal strokeWidth={1.5} className="size-4" />
-                    <span>{row.medals.length || "N/A"}</span>
+                    <span>{row.medals.length}</span>
                   </div>
                 </TableCell>
                 <TableCell className="!font-inter !text-center">
-                  {row.points || "N/A"}
+                  {row.points}
                 </TableCell>
                 <TableCell className="!font-inter">
-                  {row.skills.length || "N/A"}
+                  {row.skills.length}{" "}
+                  {/* replace skills with the right object key when available */}
                 </TableCell>
                 <TableCell className="!font-inter !text-center">
-                  {row.results.length || "N/A"}
+                  {row.results.length}
                 </TableCell>
                 <TableCell className="!font-inter !text-center">
-                  {row.challengeAchievements.length || "N/A"}
+                  {row.challengeAchievements.length}
                 </TableCell>
-                <TableCell className="!font-inter !text-center">
-                  {row.badges.length || "N/A"}
+                <TableCell className="!font-inter truncate">
+                  {row.createdAt
+                    ? formatDate(row.createdAt)
+                    : formatDate(Date.now())}
                 </TableCell>
                 <TableCell>
-                  <UserDropdownMenu />
+                  <UserDropdownMenu id={row.id} />
                 </TableCell>
               </TableRow>
             ))}
