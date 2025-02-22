@@ -21,6 +21,7 @@
     "@types/react-lazy-load-image-component": "^1.6.4",
     "@types/styled-components": "^5.1.34",
     "axios": "^1.7.9",
+    "axios-retry": "^4.5.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "countup.js": "^2.8.0",

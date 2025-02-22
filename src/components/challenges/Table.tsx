@@ -133,9 +133,9 @@ const AllChallengesTable: React.FC = () => {
   return (
     <Box className="my-4">
       {isEmpty ? (
-        <EmptyState message="No challenge found" />
+        <EmptyState message="No challenge found" hide />
       ) : isLoading ? (
-        <EmptyState message="Getting challenge data" />
+        <EmptyState message="Getting challenge data" hide />
       ) : (
         <Box
           sx={{

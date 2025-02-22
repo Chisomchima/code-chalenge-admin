@@ -8,6 +8,7 @@ const Login = lazy(() => import("./pages/login"));
 const Home = lazy(() => import("./pages/home"));
 const Challenges = lazy(() => import("./pages/challenges"));
 const CreateChallenge = lazy(() => import("./pages/challenges/create"));
+const ViewChallenge = lazy(() => import("./pages/challenges/view"));
 const Users = lazy(() => import("./pages/users"));
 const NotFoundPage = React.lazy(() => import("./pages/not-found.tsx"));
 
@@ -21,6 +22,7 @@ const routes = [
   { path: "/challenges/new", component: CreateChallenge, protected: true },
   { path: "/users", component: Users, protected: true },
   { path: "/challenges/edit/:id", component: CreateChallenge, protected: true },
+  { path: "/challenges/view/:id", component: ViewChallenge, protected: true },
 ];
 
 function App() {
