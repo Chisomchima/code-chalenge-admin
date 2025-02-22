@@ -1,4 +1,4 @@
-import { Box, TableCell, TableRow } from "@mui/material";
+import { Box, TableCell, TableRow, Typography } from "@mui/material";
 import FilterButtons from "@/components/ui/filterButtons";
 import StatsBar from "@/components/ui/statsBar";
 import { STATS_BAR_DATA, usersMockData } from "./mock_data/_schema";
