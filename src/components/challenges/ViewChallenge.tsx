@@ -38,7 +38,8 @@ const ViewChallenge: React.FC = () => {
   }
 
   const handleEdit = () => {
-    navigate(`/challenges/edit/${challengeData?.id}`);
+    // Force a hard reload by using window.location
+    window.location.href = `/challenges/edit/${challengeData?.id}`;
   };
 
   const handleDelete = () => {
