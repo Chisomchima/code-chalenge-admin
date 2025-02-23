@@ -6,6 +6,20 @@ import axios, {
 } from "axios";
 import Cookies from "js-cookie";
 import { toast } from "react-toastify";
+import axiosRetry from "axios-retry";
+
+interface ApiError {
+  error?: {
+    error?: string;
+    message?: string;
+    code?: string;
+  };
+}
+
+const TOKEN_STORAGE_KEY = "authToken";
+const REFRESH_TOKEN_KEY = "refreshToken";
+const USER_ID_KEY = "userId";
+const USER_PROFILE_KEY = "userProfile";
 
 // Ensure the baseURL is defined and correctly typed
 const baseURL: string = import.meta.env.VITE_API_URL as string;
@@ -21,6 +35,7 @@ export const axiosInstance: AxiosInstance = axios.create({
   baseURL,
   withCredentials: true,
   timeout: 10000,
+  timeoutErrorMessage: "Request timeout - please try again",
 });
 
 // Request Interceptor
@@ -39,6 +54,17 @@ axiosInstance.interceptors.request.use(
   }
 );
 
+axiosRetry(axiosInstance, {
+  retries: 3,
+  retryDelay: axiosRetry.exponentialDelay,
+  retryCondition: (error: AxiosError) => {
+    return (
+      axiosRetry.isNetworkOrIdempotentRequestError(error) ||
+      error.response?.status === 429
+    );
+  },
+});
+
 // Response Interceptor
 axiosInstance.interceptors.response.use(
   (response) => response,
@@ -53,19 +79,38 @@ axiosInstance.interceptors.response.use(
   }
 );
 
-// Function to handle redirection to login
 export const redirectToLogin = () => {
-  Cookies.remove("authToken");
-  Cookies.remove("userId");
-  Cookies.remove("userProfile");
-  window.location.href = "/login";
+  const keysToRemove = [
+    TOKEN_STORAGE_KEY,
+    REFRESH_TOKEN_KEY,
+    USER_ID_KEY,
+    USER_PROFILE_KEY,
+  ];
+  keysToRemove.forEach((key) => Cookies.remove(key));
+  window.location.replace("/login");
+};
+
+export const createCancelToken = () => {
+  const source = axios.CancelToken.source();
+  return source;
 };
 
 // Function to handle errors and display toast notifications
-export const handleError = (error: AxiosError, fallbackMessage: string) => {
+export const handleError = (
+  error: AxiosError<ApiError>,
+  fallbackMessage: string
+) => {
   const errorMessage =
-    (error?.response?.data as { error?: { error?: string } })?.error?.error ||
+    error?.response?.data?.error?.message ||
+    error?.response?.data?.error?.error ||
+    error.message ||
     fallbackMessage;
-  console.error("Handled error:", error);
+
+  console.error("Error details:", {
+    status: error?.response?.status,
+    message: errorMessage,
+    path: error?.config?.url,
+  });
+
   toast.error(errorMessage);
 };

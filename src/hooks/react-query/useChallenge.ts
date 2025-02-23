@@ -21,6 +21,10 @@ export const useGetAllChallenges = (param: string) => {
 export const useGetChallengeById = (id: string | undefined) => {
   return useQuery(["getChallengeById", id], () => GetChallengeById(id), {
     enabled: !!id,
+    staleTime: 0,
+    cacheTime: 0,
+    refetchOnMount: true,
+    refetchOnWindowFocus: false,
   });
 };
 
