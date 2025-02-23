@@ -10,18 +10,24 @@ import {
   ListItem,
   ListItemText,
 } from "@mui/material";
-import { useGetChallengeById } from "../../hooks/react-query/useChallenge";
+import {
+  useDeleteChallenge,
+  useGetChallengeById,
+} from "../../hooks/react-query/useChallenge";
 import Loader from "../ui/Loader";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 
 const ViewChallenge: React.FC = () => {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  const { mutate: deleteChallenge, isLoading: loadingDel } =
+    useDeleteChallenge();
   const { data: response, isLoading: isFetching } = useGetChallengeById(id);
   const challengeData = response?.content;
 
-  if (isFetching) return <Loader />;
+  if (isFetching || loadingDel) return <Loader />;
 
   if (!challengeData) {
     return (
@@ -31,6 +37,19 @@ const ViewChallenge: React.FC = () => {
     );
   }
 
+  const handleEdit = () => {
+    navigate(`/challenges/edit/${challengeData?.id}`);
+  };
+
+  const handleDelete = () => {
+    if (challengeData?.id) {
+      deleteChallenge(challengeData.id, {
+        onSuccess: () => {
+          navigate("/challenges");
+        },
+      });
+    }
+  };
   return (
     <Box>
       <Box sx={{ position: "relative" }}>
@@ -105,6 +124,7 @@ const ViewChallenge: React.FC = () => {
               color="primary"
               variant="outlined"
               sx={{ textTransform: "initial" }}
+              onClick={handleEdit}
             >
               Edit
             </Button>
@@ -112,6 +132,7 @@ const ViewChallenge: React.FC = () => {
               color="warning"
               variant="outlined"
               sx={{ textTransform: "initial" }}
+              onClick={handleDelete}
             >
               Delete
             </Button>
@@ -156,7 +177,7 @@ const ViewChallenge: React.FC = () => {
         </Stack>
         {challengeData?.acceptanceCriteria.length > 0 && (
           <>
-            <Typography variant="h6" sx={{ mb: 1 }}>
+            <Typography variant="body1" fontWeight={900}>
               Acceptance Criteria
             </Typography>
             <List>
@@ -176,7 +197,7 @@ const ViewChallenge: React.FC = () => {
 
         {challengeData.rulesAndResources.length > 0 && (
           <>
-            <Typography variant="h6" sx={{ mb: 1 }}>
+            <Typography variant="body1" fontWeight={900}>
               Rules and Resources
             </Typography>
             <List>
@@ -194,7 +215,7 @@ const ViewChallenge: React.FC = () => {
 
         {challengeData?.onlineResources.length > 0 && (
           <>
-            <Typography variant="h6" sx={{ mb: 1 }}>
+            <Typography variant="body1" fontWeight={900}>
               Online Resources
             </Typography>
             <List>
