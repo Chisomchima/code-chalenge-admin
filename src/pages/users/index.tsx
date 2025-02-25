@@ -16,16 +16,7 @@ import { LazyLoadImage } from "react-lazy-load-image-component";
 import "react-lazy-load-image-component/src/effects/blur.css";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-
-// Utility function to format the date
-const formatDate = (dateString: string | number) => {
-  const date = new Date(dateString);
-  return date.toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  });
-};
+import { formatDate } from "@/utils/helpers";
 
 const EmptyState = ({ message }: { message: string }) => (
   <Box className="flex flex-col items-center justify-center p-8 h-[40vh]">
