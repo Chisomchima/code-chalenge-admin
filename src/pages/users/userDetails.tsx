@@ -40,16 +40,22 @@ const UserDetailsPage = () => {
 
   const userDetails = [
     { label: "Email:", value: data.email || "johndoe@example.com" },
-    { label: "Badge:", value: "Explorer" },
-    { label: "Number of medals:", value: "12" },
-    { label: "Portfolio Link:", value: "https://www.link.com" },
-    { label: "LinkedIn Link:", value: "https://www.link.com" },
-    { label: "Total Reviews:", value: "0" },
-    { label: "Achievements:", value: "12" },
+    { label: "Badge:", value: data.badges[0] },
+    { label: "Number of medals:", value: data.medals.length.toString() || "0" },
+    { label: "Portfolio Link:", value: data.portfolio || "not-set" },
+    { label: "LinkedIn Link:", value: data.linkedin || "not-set" },
+    { label: "Total Reviews:", value: data.reviews || "0" },
+    {
+      label: "Achievements:",
+      value: "0",
+    },
   ];
 
   const additionalDetails = [
-    { label: "Completion Rate:", value: "98%" },
+    {
+      label: "Completion Rate:",
+      value: `${data.challengeAchievements.length}%` || "0%",
+    },
     { label: "Signup Date:", value: formatDate(Date.now()) },
   ];
 
@@ -135,7 +141,9 @@ const UserDetailsPage = () => {
       <div className="max-w-4xl mx-auto">
         <div className="mt-20 flex flex-col space-y-3 w-[350px]">
           {userDetails.map((detail, index) => (
-            <div key={index}>{renderDetailRow(detail.label, detail.value)}</div>
+            <div key={index}>
+              {renderDetailRow(detail.label, detail.value as string)}
+            </div>
           ))}
         </div>
 

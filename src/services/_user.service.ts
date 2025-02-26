@@ -25,7 +25,7 @@ export const getSingleUserData = async (id: string): Promise<User> => {
   try {
     const response = await axiosInstance.get<User>(`/api/users/get-user/${id}`);
 
-    return response.data;
+    return response.data.content;
   } catch (error) {
     handleError(error as AxiosError, "An unexpected error occurred.");
     toast.error("Failed to get users.");
