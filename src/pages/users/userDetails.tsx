@@ -1,6 +1,5 @@
-import { useEffect } from "react";
 import { LazyLoadImage } from "react-lazy-load-image-component";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import Banner from "./asssets/svg/userDetailsPageBanner.svg";
 import { CircleSlash, Copy, TvMinimal, User } from "lucide-react";
 import { useUser } from "./hook/userUser";
@@ -12,16 +11,7 @@ import { toast } from "react-toastify";
 const UserDetailsPage = () => {
   const { id } = useParams();
   const { getSingleUser } = useUser();
-  const navigate = useNavigate();
   const { data } = getSingleUser(id || "");
-
-  useEffect(() => {
-    setTimeout(() => {
-      if (!data) {
-        navigate("/*");
-      }
-    }, 5000);
-  }, [data, navigate]);
 
   if (!data) return null;
 
