@@ -16,9 +16,11 @@ const UserDetailsPage = () => {
   const { data } = getSingleUser(id || "");
 
   useEffect(() => {
-    if (!data) {
-      navigate("/*");
-    }
+    setTimeout(() => {
+      if (!data) {
+        navigate("/*");
+      }
+    }, 5000);
   }, [data, navigate]);
 
   if (!data) return null;
