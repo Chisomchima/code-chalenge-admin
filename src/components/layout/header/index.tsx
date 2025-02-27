@@ -15,6 +15,7 @@ const enum Navigation {
   Dashboard = "Dashboard",
   ChallengePage = "Challenges",
   users = "Users",
+  userDetails = "User Details",
   community = "Community",
   admins = "Admins",
 }
@@ -36,6 +37,8 @@ const Header: React.FC<{
         return Navigation.ChallengePage;
       case "users":
         return Navigation.users;
+      case "user":
+        return Navigation.userDetails;
       case "community":
         return Navigation.community;
       case "admins":

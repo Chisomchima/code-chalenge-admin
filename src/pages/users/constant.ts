@@ -15,11 +15,12 @@ interface AttemptedChallenge {
 }
 
 export interface User {
-  avatar: Avatar;
+  id: string;
   firstName: string;
   lastName: string;
   email: string;
   signInMethod: string;
+  avatar: Avatar;
   points: number;
   results: any[];
   badges: string[];
@@ -34,5 +35,6 @@ export interface User {
   badgeAchievements: any[];
   challengeAchievements: any[];
   mentorAchievements: any[];
-  id: string | number;
+  createdAt: string;
+  reviews: any[];
 }
