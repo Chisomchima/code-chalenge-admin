@@ -9,6 +9,9 @@ import {
   List,
   ListItem,
   ListItemText,
+  Link,
+  Container,
+  Grid,
 } from "@mui/material";
 import {
   useDeleteChallenge,
@@ -18,6 +21,8 @@ import Loader from "../ui/Loader";
 import { useNavigate, useParams } from "react-router-dom";
 import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
+import { DetailRowProps, ListSectionProps } from "./types";
+import { LazyLoadImage } from "react-lazy-load-image-component";
 
 const ViewChallenge: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -52,198 +57,209 @@ const ViewChallenge: React.FC = () => {
     }
   };
   return (
-    <Box>
-      <Box sx={{ position: "relative" }}>
+    <Container maxWidth="lg">
+      <Box sx={{ position: "relative", mb: 10 }}>
+        {/* Hero Banner */}
         <Box
           sx={{
             width: "100%",
-            height: 150,
-            backgroundImage: `url("../../../public/images/formbg.svg")`,
+            height: 200,
+            backgroundImage: `url("/images/formbg.svg")`,
             backgroundSize: "cover",
             borderRadius: 2,
-            padding: 2,
           }}
         />
+
+        {/* Challenge Header Card */}
         <Card
           sx={{
             position: "absolute",
-            top: 100,
+            top: 120,
             left: "50%",
             transform: "translateX(-50%)",
-            width: "90%",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            padding: 2,
+            width: "95%",
+            maxWidth: 1100,
+            p: 3,
             boxShadow: 3,
           }}
         >
           <Stack
-            direction="row"
-            spacing={2}
-            alignItems="center"
-            sx={{ flexGrow: 1 }}
+            direction={{ xs: "column", sm: "row" }}
+            spacing={3}
+            alignItems={{ xs: "start", sm: "center" }}
+            justifyContent="space-between"
           >
-            <Avatar
-              variant="rounded"
-              src={challengeData?.challengeImage?.url}
-              sx={{ width: 60, height: 60 }}
-            />
-            <Stack direction="column" spacing={1} alignItems="start">
-              <Typography variant="h6">{challengeData.title}</Typography>
-              <Stack direction="row" alignItems="center" spacing={1}>
-                <FiberManualRecordIcon
-                  sx={{ fontSize: 10, color: "primary.main" }}
-                />
-
-                <Typography variant="body2" component="span">
-                  {challengeData.focusArea}
-                </Typography>
-
-                <Stack direction="row" alignItems="center" spacing={0.5}>
-                  <CalendarMonthIcon
-                    fontSize="small"
-                    sx={{ color: "text.secondary" }}
-                  />
-                  <Typography
-                    variant="body2"
-                    component="span"
-                    color="text.secondary"
-                  >
-                    Updated:{" "}
-                    {new Date(
-                      challengeData.publication.publishedOn
-                    ).toLocaleDateString()}
-                  </Typography>
+            {/* Left Section */}
+            <Stack direction="row" spacing={2} alignItems="center">
+              <LazyLoadImage
+                src={challengeData?.challengeImage?.url}
+                alt="banner"
+                className="w-10 h-10 object-cover rounded-md"
+              />
+              <Stack spacing={1}>
+                <Typography variant="h5">{challengeData.title}</Typography>
+                <Stack direction="row" spacing={2} alignItems="center">
+                  <Stack direction="row" alignItems="center" spacing={1}>
+                    <FiberManualRecordIcon
+                      sx={{ fontSize: 8, color: "primary.main" }}
+                    />
+                    <Typography variant="body2">
+                      {challengeData.focusArea}
+                    </Typography>
+                  </Stack>
+                  <Stack direction="row" alignItems="center" spacing={1}>
+                    <CalendarMonthIcon fontSize="small" color="action" />
+                    <Typography variant="body2" color="text.secondary">
+                      Updated:{" "}
+                      {new Date(
+                        challengeData.publication.publishedOn
+                      ).toLocaleDateString()}
+                    </Typography>
+                  </Stack>
                 </Stack>
               </Stack>
             </Stack>
-          </Stack>
 
-          <Stack direction="row" spacing={2} alignItems="center">
-            <Button
-              color="primary"
-              variant="outlined"
-              sx={{ textTransform: "initial" }}
-              onClick={handleEdit}
-            >
-              Edit
-            </Button>
-            <Button
-              color="warning"
-              variant="outlined"
-              sx={{ textTransform: "initial" }}
-              onClick={handleDelete}
-            >
-              Delete
-            </Button>
+            {/* Right Section */}
+            <Stack direction="row" spacing={2}>
+              <Button
+                variant="outlined"
+                color="primary"
+                onClick={handleEdit}
+                sx={{ minWidth: 100 }}
+              >
+                Edit
+              </Button>
+              <Button
+                variant="outlined"
+                color="warning"
+                onClick={handleDelete}
+                sx={{ minWidth: 100 }}
+              >
+                Delete
+              </Button>
+            </Stack>
           </Stack>
         </Card>
       </Box>
 
+      {/* Challenge Details Section */}
       <Box
         sx={{
-          marginTop: "80px",
-          borderRadius: "10px",
-          padding: "2rem",
-          border: "1px solid #E5E5E5",
+          mt: 10,
+          borderRadius: 2,
+          p: 4,
+          border: "1px solid",
+          borderColor: "divider",
         }}
       >
-        <Stack direction="row" spacing={15} sx={{ mt: 3, mb: 3 }}>
-          <Typography variant="body1" fontWeight={900}>
-            Description
-          </Typography>
-          <Typography variant="body1">{challengeData.description}</Typography>
+        {/* Info Grid */}
+        <Grid container spacing={4}>
+          <Grid item xs={12}>
+            <DetailRow label="Description" value={challengeData.description} />
+          </Grid>
+          <Grid item xs={12}>
+            <DetailRow
+              label="Prerequisites"
+              value={challengeData.prerequisites}
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <DetailRow label="Skill Level" value={challengeData.skillLevel} />
+          </Grid>
+          <Grid item xs={12}>
+            <DetailRow label="Focus Area" value={challengeData.focusArea} />
+          </Grid>
+        </Grid>
+
+        {/* Lists Section */}
+        <Stack spacing={4} sx={{ mt: 4 }}>
+          {challengeData?.acceptanceCriteria.length > 0 && (
+            <ListSection
+              title="Acceptance Criteria"
+              items={challengeData.acceptanceCriteria}
+            />
+          )}
+
+          {challengeData.rulesAndResources.length > 0 && (
+            <ListSection
+              title="Rules and Resources"
+              items={challengeData.rulesAndResources}
+            />
+          )}
+
+          {challengeData?.onlineResources.length > 0 && (
+            <ListSection
+              title="Online Resources"
+              items={challengeData.onlineResources}
+              isLink
+            />
+          )}
+
+          {challengeData?.attachments.length > 0 && (
+            <ListSection
+              title="Attachments"
+              items={challengeData.attachments}
+            />
+          )}
         </Stack>
 
-        <Stack direction="row" spacing={13} sx={{ mt: 3, mb: 3 }}>
-          <Typography variant="body1" fontWeight={900}>
-            Prerequisites
-          </Typography>
-          <Typography variant="body1" sx={{ mb: 3 }}>
-            {challengeData.prerequisites}
-          </Typography>
-        </Stack>
-        <Stack direction="row" spacing={17} sx={{ mt: 3, mb: 3 }}>
-          <Typography variant="body1" fontWeight={900}>
-            Skill Level
-          </Typography>
-          <Typography variant="body1">{challengeData.skillLevel}</Typography>
-        </Stack>
-        <Stack direction="row" spacing={17} sx={{ mt: 3, mb: 3 }}>
-          <Typography variant="body1" fontWeight={900}>
-            Focus Area
-          </Typography>
-          <Typography variant="body1">{challengeData.focusArea}</Typography>
-        </Stack>
-        {challengeData?.acceptanceCriteria.length > 0 && (
-          <>
-            <Typography variant="body1" fontWeight={900}>
-              Acceptance Criteria
-            </Typography>
-            <List>
-              {challengeData.acceptanceCriteria.map(
-                (criteria: any, index: number) => (
-                  <ListItem key={criteria._id}>
-                    <ListItemText
-                      primary={`${index + 1}. ${criteria.title}`}
-                      secondary={criteria.description}
-                    />
-                  </ListItem>
-                )
-              )}
-            </List>
-          </>
-        )}
-
-        {challengeData.rulesAndResources.length > 0 && (
-          <>
-            <Typography variant="body1" fontWeight={900}>
-              Rules and Resources
-            </Typography>
-            <List>
-              {challengeData.rulesAndResources.map((rule: any, index: any) => (
-                <ListItem key={rule._id}>
-                  <ListItemText
-                    primary={`${index + 1}. ${rule.title}`}
-                    secondary={rule.description}
-                  />
-                </ListItem>
-              ))}
-            </List>
-          </>
-        )}
-
-        {challengeData?.onlineResources.length > 0 && (
-          <>
-            <Typography variant="body1" fontWeight={900}>
-              Online Resources
-            </Typography>
-            <List>
-              {challengeData.onlineResources.map(
-                (resource: any, index: React.Key | null | undefined) => (
-                  <ListItem key={index}>
-                    <ListItemText
-                      primary={`${(index as number) + 1}. ${resource}`}
-                    />
-                  </ListItem>
-                )
-              )}
-            </List>
-          </>
-        )}
-
-        <Box sx={{ mt: 3 }}>
-          <Typography variant="caption" color="textSecondary">
-            Published on:{" "}
-            {new Date(
-              challengeData.publication.publishedOn
-            ).toLocaleDateString()}
-          </Typography>
-        </Box>
+        {/* Footer */}
+        <Typography
+          variant="caption"
+          color="text.secondary"
+          sx={{ mt: 4, display: "block" }}
+        >
+          Published on:{" "}
+          {new Date(challengeData.publication.publishedOn).toLocaleDateString()}
+        </Typography>
       </Box>
-    </Box>
+    </Container>
   );
 };
+
+// Helper Components
+
+const DetailRow: React.FC<DetailRowProps> = ({ label, value }) => (
+  <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
+    <Typography variant="subtitle1" fontWeight="bold" sx={{ minWidth: 150 }}>
+      {label}
+    </Typography>
+    <Typography variant="body1">{value}</Typography>
+  </Stack>
+);
+
+const ListSection: React.FC<ListSectionProps> = ({ title, items, isLink }) => (
+  <Box>
+    <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
+      {title}
+    </Typography>
+    <List>
+      {items.map((item, index) => (
+        <ListItem key={item._id}>
+          {isLink ? (
+            <Link
+              href={item.description}
+              target="_blank"
+              rel="noopener noreferrer"
+              sx={{
+                textDecoration: "none",
+                color: "primary.main",
+                "&:hover": { textDecoration: "underline" },
+              }}
+            >
+              {`${index + 1}. ${item.title}`}
+            </Link>
+          ) : (
+            <ListItemText
+              primary={`${index + 1}. ${item.title}`}
+              secondary={item.description}
+            />
+          )}
+        </ListItem>
+      ))}
+    </List>
+  </Box>
+);
 
 export default ViewChallenge;

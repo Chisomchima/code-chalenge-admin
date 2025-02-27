@@ -84,3 +84,14 @@ export interface ISearchBarProps {
   searchQuery: string;
   setSearchQuery: (query: string) => void;
 }
+
+export interface DetailRowProps {
+  label: string;
+  value: string;
+}
+
+export interface ListSectionProps {
+  title: string;
+  items: Array<{ _id: string; title: string; description: string }>;
+  isLink?: boolean;
+}
